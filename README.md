@@ -101,6 +101,219 @@ step:
 
 ### 组件编辑
 
+#### 组件响应式+page.svelte
+```html
+<script lang="ts">
+
+  // 需要大写
+
+  import Nested from '../components/Nested.svelte';
+
+  
+
+  let name = 'hello world';
+
+  let src = '/src/assets/mylog.png';
+
+  
+
+  // 支持插入 原生js
+
+  let string = `<strong>粗体</strong>`;
+
+  // string = "<a href='www.baidu.com'>点我跳转</a>";
+
+  
+
+  // 响应式绑定
+
+  let count = 0;
+
+  function increment(e: any) {
+
+    console.log(e);
+
+    count++;
+
+    console.log(e.target, count);
+
+  }
+
+  
+
+  // 计算属性
+
+  $: doubled = count * 2;
+
+  // 高级监听器，但不是函数式的，而是函数体本身，
+
+  $: console.log(`自动监听？ ${doubled}`);
+
+  // 这里只会执行一次.
+
+  $: {
+
+    console.log("1");
+
+    console.log("2");
+
+  }
+
+  // 写判断都可以。。。
+
+  $: if (count > 10){
+
+    alert(`${count}`)
+
+    count = 0
+
+  }
+
+  
+
+  
+
+</script>
+
+  
+
+<!-- 模板语法{} -->
+
+<h1>{name}</h1>
+
+<!-- 支持jsx类似的语法 -->
+
+<div>{name.toUpperCase()}</div>
+
+<!-- 大括号支持属性值 -->
+
+<img {src} alt="A man dances." />
+
+<!-- 支持简写 -->
+
+<img {src} alt="A man dances." />
+
+<!-- @html关键字支持引入html原始语法，容易造成xss攻击 -->
+
+<p>{@html string}</p>
+
+  
+
+<!-- 响应式 -->
+
+<button on:click={increment}>
+
+  Clicked {count}
+
+  {count === 1 ? 'time' : 'times'}
+
+</button>
+
+  
+
+<p>计算值 {doubled}</p>
+
+  
+
+<!-- 组件引入 -->
+
+<Nested></Nested>
+
+  
+  
+
+<style>
+
+  h1 {
+
+    color: red;
+
+  }
+
+</style>
+```
+#### 子组件Nested.svelte
+```html
+<script>
+	$: console.log(`组件初始化时，自动执行，参数变化时，自动执行`);
+
+	// 引入
+	let nums = [0, 1, 2, 3];
+	const obj = { foo: { bar: 0 } };
+	const foo = obj.foo;
+	function addNumber() {
+		// nums push反而会失去响应式
+		// nums.push(nums.length + 1);
+		// 更常用的方法， pop 、 shift 和 unshift splice 。都是如此
+		// nums = [...nums, nums.length++];
+		// 数组需要索引赋值，也可以引起响应式的改变
+		nums[nums.length] = nums.length;
+		// 对象则可以自动响应
+		obj.foo.bar = nums.length;
+	}
+</script>
+
+<p>这是一个嵌入的组件</p>
+<p>
+	{nums.join(' + ') +
+		`=${nums.reduce((previousValue, currentValue) => previousValue + currentValue), 0}`}
+</p>
+<p>对象赋值的修改:{obj.foo.bar}:{foo.bar}</p>
+<button on:click={addNumber}> 点我 </button>
+
+<style>
+	p {
+		color: goldenrod;
+		font-family: 'Comic Sans MS', cursive;
+		font-size: 2em;
+	}
+</style>
+
+```
+#### 子组件传参props
+父组件
+```html
+<script>
+	// @ts-nocheck
+	import Props from '../../components/Props.svelte';
+
+	const pkg = {
+		website: 'https://svelte.dev'
+	};
+
+	setTimeout(() => {
+		pkg.website = 'https://www.google.com';
+	}, 2000);
+
+	let count = 0;
+	function increment() {
+		count += 1;
+	}
+</script>
+
+<h1>开始子组件传参</h1>
+<!-- <Props answer={42}></Props> -->
+<!-- <Props></Props> -->
+<!-- 批量传参 -->
+<Props {...pkg}></Props>
+```
+子组件
+```html
+<script>
+  // 这里接参数，居然用export，暴露语法
+	// export let answer;
+  // 如果组件传参涉及到
+	export let answer = "默认值";
+	export let website;
+</script>
+
+<p>The answer is {answer}</p>
+<p>{website}</p>
+
+```
+#### 模板逻辑语法
+`太像jsx语法了 😀`
+
 
 
 
