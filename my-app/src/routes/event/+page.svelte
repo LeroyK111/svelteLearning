@@ -7,16 +7,22 @@
 		m.y = event.clientY;
 	}
 
-  // 回调函数
-	function sayHello() {
+	import Inner from '../../components/Inner.svelte';
+	function handleChange(value: any) {
+    console.log('Value changed:', value);
+  }
 
+	function handleLoaded() {
+    console.log('Component loaded');
+  }
+
+	function handleMessage(event) {
+		alert(event.detail.text);
 	}
-
-  
-
 </script>
 
 <h1>全部的事件捕获</h1>
+
 <!-- <div style="margin-top: 100px;" on:pointermove={handleMove}>
 	The pointer is at {m.x} x {m.y}
 </div> -->
@@ -40,6 +46,10 @@
 <button on:click|self={() => alert('clicked')}> Click me </button>
 <button on:click|trusted={() => alert('clicked')}> Click me </button>
 <button on:click|trusted|once={() => alert('clicked')}> Click me </button> -->
+
+<!-- 老方法，事件传递 -->
+<!-- <Inner on:message={handleMessage} /> -->
+<Inner handleChange={handleChange} greeting={handleLoaded} on:message={handleMessage}/>
 
 
 
