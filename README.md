@@ -313,6 +313,158 @@ step:
 ```
 #### 模板逻辑语法
 `太像jsx语法了 😀`
+##### #if语法
+```jsx
+<!-- 太像jsx语法，不过非常模板化 -->
+{#if count > 3}
+	<p>{count} 单IF</p>
+{/if}
+
+{#if count > 2}
+	<p>{count} if else</p>
+{:else}
+	<p>{count} 非常可怕</p>
+{/if}
+
+
+{#if count > 10}
+	<p>{count} is greater than 10</p>
+{:else if count < 5}
+	<p>{count} is less than 5</p>
+{:else}
+	<p>{count} is between 5 and 10</p>
+{/if}
+```
+##### #each语法
+```jsx
+  <!-- 迭代器：#each array as value, index, array-->
+  <!-- 这里涉及到无障碍属性，一般都是结合css判断的 -->
+  {#each colors as color, i}
+		<button
+			aria-current={selected === color}
+      aria-label={color}
+			style="background: {color}"
+			on:click={() => selected = color}
+		>{i + 1}</button>
+	{/each}
+```
+`加入索引key，优化动态dom`
+```jsx
+<!-- 这里失去了绑定，原有的dom继续存在，这里就发生了错位 -->
+<!-- 一旦你想要更新things，就会发生dom渲染的错位 -->
+{#each things as thing}
+	<Thing name={thing.name} />
+{/each}
+{#each things as thing (thing.id)}
+	<Thing name={thing.name} />
+{/each}
+```
+##### #await异步语法
+```jsx
+<script>
+	import { getRandomNumber } from '../../hooks/utils.ts';
+
+	let promise = getRandomNumber();
+
+	function handleClick() {
+		promise = getRandomNumber();
+	}
+
+
+
+
+</script>
+
+<button on:click={handleClick}>
+	generate random number
+</button>
+
+
+<!-- 如果是异步函数，则无法显示 -->
+{#if promise}
+	{promise}
+{:else}
+	<p>waiting...</p>
+{/if}
+
+<!-- promise then catch 都可以生效, 除了finally-->
+<!-- 这里我们使用异步语法，就可以获取异步函数了 -->
+{#await promise}
+	<p>...waiting</p>
+{:then number}
+	<p>The number is {number}</p>
+{:catch error}
+	<p style="color: red">{error.message}</p>
+{/await}
+
+<!-- 简写写法 -->
+{#await promise then number}
+	<p>The number is {number}</p>
+{/await}
+
+```
+#### DOM事件
+##### on:pointermove 鼠标移动
+```jsx
+<script lang="ts">
+	let m = { x: 0, y: 0 };
+
+	function handleMove(event: PointerEvent ) {
+    console.log(event);
+		m.x = event.clientX;
+		m.y = event.clientY;
+	}
+</script>
+
+
+<h1>全部的事件捕获</h1>
+
+<div style="margin-top: 100px;" on:pointermove={handleMove}>
+	The pointer is at {m.x} x {m.y}
+</div>
+
+<!-- 内联处理事件 -->
+<div
+	on:pointermove={(e) => {
+		m = { x: e.clientX, y: e.clientY };
+	}}
+>
+	The pointer is at {m.x} x {m.y}
+</div>
+
+<style>
+	div {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		padding: 1rem;
+	}
+</style>
+```
+##### |事件修饰符
+```jsx
+<!-- 事件修饰符 -->
+
+<button on:click|once={() => alert('clicked')}> Click me </button>
+
+<button on:click|preventDefault={() => alert('clicked')}> Click me </button>
+
+<button on:click|stopPropagation={() => alert('clicked')}> Click me </button>
+
+<button on:click|passive={() => alert('clicked')}> Click me </button>
+
+<button on:click|nonpassive={() => alert('clicked')}> Click me </button>
+
+<button on:click|capture={() => alert('clicked')}> Click me </button>
+
+<button on:click|self={() => alert('clicked')}> Click me </button>
+
+<button on:click|trusted={() => alert('clicked')}> Click me </button>
+
+<button on:click|trusted|once={() => alert('clicked')}> Click me </button>
+```
 
 
 
