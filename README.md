@@ -29,6 +29,16 @@
 - Svelte for VS Code
 - Svelte Intellisense
 
+### 官方插件
+
+官方推荐依赖：https://www.sveltesociety.dev/packages
+- SPA应用的路由器
+	- Svelte Routing
+	- routify
+- SPA应用全局状态管理
+	- 原生的，非常推荐。
+	- @tanstack/svelte-query
+
 ### 使用 vite 构建 svelte 前端应用
 ```md
 - 只能构建 svelte 前端应用
@@ -465,6 +475,541 @@ step:
 
 <button on:click|trusted|once={() => alert('clicked')}> Click me </button>
 ```
+##### 组件事件传递
+父组件
+```jsx
+<!-- 老方法，事件传递 -->
+<!-- <Inner on:message={handleMessage} /> -->
+<Inner handleChange={handleChange} greeting={handleLoaded} on:message={handleMessage}/>
+```
+子组件
+```jsx
+<script>
+	import Grandsons from "./Grandsons.svelte"
+	// 这是v4版本的父子组件事件传递
+	// import { createEventDispatcher } from 'svelte';
+	// const dispatch = createEventDispatcher();
+	// function sayHello() {
+	// 	dispatch('message', {
+	// 		text: 'Hello!'
+	// 	});
+	// }
+	// 使用最好的v5版本的父子组件事件传递
+	// !声明式语法也可以
+	// export let greeting;
+  // 二者选其一， 否则会报错
+	let { handleChange, greeting } = $props();
+</script>
+
+<button on:click={() => handleChange(111)}> Click to say hello </button>
+<button on:click={greeting}> Click to say hello </button>
+<Grandsons on:message ></Grandsons>
+```
+孙组件
+```jsx
+<script>
+  // 使用老api可以实现跨层级传递事件
+import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	function sayHello() {
+		dispatch('message', {
+			text: 'Hello!'
+		});
+	}
+</script>
+
+<button on:click={sayHello}> Click to say hello </button>
+
+```
+
+#### 数据绑定bind
+
+```vue
+
+<script>
+  import Markdown  from "../../components/Markdown.svelte"
+
+	let name = 'word';
+
+	let a = 1;
+	let b = 2;
+
+	let yes = false;
+
+	let questions = [
+		{
+			id: 1,
+			text: `Where did you go to school?`
+		},
+		{
+			id: 2,
+			text: `What is your mother's name?`
+		},
+		{
+			id: 3,
+			text: `What is another personal fact that an attacker could easily find with Google?`
+		}
+	];
+	const handleChange = (e) => {
+		console.log(e.currentTarget);
+	};
+	let selected = 2;
+
+
+
+	// 多选框
+	let scoops = 1;
+	let flavours = ['cookies and cream'];
+	$: console.log(flavours);
+
+	$: console.log(scoops);
+</script>
+
+<h1>数据绑定</h1>
+
+<!-- 字符串绑定 -->
+<input type="text" bind:value={name} />
+<p>{name}</p>
+
+<!-- 数字输入框 -->
+<label>
+	<input type="number" bind:value={a} min="0" max="10" />
+	<input type="range" bind:value={a} min="0" max="10" />
+</label>
+<label>
+	<input type="number" bind:value={b} min="0" max="10" />
+	<input type="range" bind:value={b} min="0" max="10" />
+</label>
+
+<!-- 复选框 -->
+<div>
+	<label>
+		<input type="checkbox" bind:checked={yes} />
+		Yes! Send me regular email spam
+	</label>
+	{#if yes}
+		<p>选中了</p>
+	{:else}
+		<p>未选中</p>
+	{/if}
+</div>
+
+<!-- 多选框 -->
+<div>
+	<select bind:value={selected} on:change={handleChange}>
+		{#each questions as question}
+			<option value={question.id}>
+				{question.text}
+			</option>
+		{/each}
+	</select>
+</div>
+
+<!-- 单选框 -->
+<div>
+	{#each [1, 2, 3] as number}
+		<label>
+			<!-- 使用 -->
+			<input type="radio" name="scoops" value={number} bind:group={scoops} />
+			{number}
+			{number === 1 ? 'scoop' : 'scoops'}
+		</label>
+	{/each}
+</div>
+
+<!-- 多选框 -->
+<div>
+	{#each ['cookies and cream', 'mint choc chip', 'raspberry ripple'] as flavour}
+		<label>
+			<input type="checkbox" name="flavours" value={flavour} bind:group={flavours} />
+			{flavour}
+		</label>
+	{/each}
+</div>
+<!-- 多选框 -->
+<div>
+  <select multiple bind:value={flavours}>
+    {#each ['cookies and cream', 'mint choc chip', 'raspberry ripple'] as flavour}
+      <option>{flavour}</option>
+    {/each}
+  </select>
+</div>
+
+
+
+<Markdown></Markdown>
+```
+简写方式
+```vue
+<script>
+
+import { marked } from 'marked';
+	let value = `Some words are *italic*, some are **bold**\n\n- lists\n- are\n- cool`;
+</script>
+
+
+
+<div class="grid">
+	input
+  <!-- 简写方式，可以快速绑定value -->
+	<textarea bind:value></textarea>
+
+	output
+	<div>{@html marked(value)}</div>
+</div>
+
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: 5em 1fr;
+		grid-template-rows: 1fr 1fr;
+		grid-gap: 1em;
+		height: 100%;
+	}
+
+	textarea {
+		flex: 1;
+		resize: none;
+	}
+</style>
+```
+
+#### 生命周期lifecycle
+
+
+###### onMount DOM挂载
+```vue
+<canvas
+	width={32}
+	height={32}
+></canvas>
+
+<style>
+	canvas {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #666;
+		mask: url(../../assets/svelte-logo-mask.svg) 50% 50% no-repeat;
+		mask-size: 60vmin;
+		-webkit-mask: url(../../assets/svelte-logo-mask.svg) 50% 50% no-repeat;
+		-webkit-mask-size: 60vmin;
+	}
+</style>
+
+<script>
+	import { onMount } from 'svelte';
+	import { paint } from '../../hooks/gradient';
+
+	onMount(() => {
+		const canvas = document.querySelector('canvas');
+		const context = canvas?.getContext('2d');
+
+    // canvas 动画创建
+		let frame = requestAnimationFrame(function loop(t) {
+			frame = requestAnimationFrame(loop);
+			paint(context, t);
+		});
+
+    // 记得销毁动画
+		return () => {
+			cancelAnimationFrame(frame);
+		};
+	});
+</script>
+```
+
+##### 废弃 beforeUpdate afterUpdate
+```vue
+ <script>
+	// import { afterUpdate, beforeUpdate } from "svelte";
+
+	// beforeUpdate(() => {
+	// 	console.log("dom更新前");
+	// });
+
+	// afterUpdate(() => {
+	// 	console.log("dom更新后");
+	// });
+</script>
+```
+##### 现在推荐$effect
+```vue
+<script>
+  $effect(() => {
+		console.log('Domg更新之后');
+  })
+  $effect.pre(()=>{
+    console.log("dom更新前");
+  })
+  // $effect.active()
+</script>
+
+<h1>测试dom更新前和dom更新后{$effect.active()}</h1>
+<div></div>
+```
+##### tick dom更新的颗粒
+```vue
+<script lang="ts">
+	import { tick } from 'svelte';
+
+	let items: string[] | [] = [];
+	let inputElement: HTMLInputElement;
+
+	async function addItem() {
+		items = [...items, `Item ${items.length + 1}`];
+		// await tick(); 等待dom更新后，再做其他操作
+		await tick();
+    // 每次有新dom生成，则自动聚焦与input输入栏
+		inputElement.focus();
+	}
+</script>
+
+<input bind:this={inputElement} placeholder="Type something..." />
+<button on:click={addItem}>Add Item</button>
+<ul>
+	{#each items as item}
+		<li>{item}</li>
+	{/each}
+</ul>
+```
+##### onDestroy组件卸载
+```vue
+<script lang="ts">
+  import { onDestroy } from 'svelte'
+
+	import Use1 from './use1.svelte';
+	import Use2 from './use2.svelte';
+
+	import { count } from '../../store/stores';
+
+	let count_value: number;
+
+  // 订阅全局对象
+	const unsubscribe = count.subscribe((value: number) => {
+		count_value = value;
+	});
+  
+
+  // 组件卸载时，自动取消订阅
+  onDestroy(unsubscribe)
+  
+</script>
+
+<h1>全局状态商店测试</h1>
+
+<div style="background-color: pink; height: 500px; width: 500px">
+	this count is {count_value}
+</div>
+
+<Use1></Use1>
+<Use2></Use2>
+
+```
+
+#### 自带store商店
+##### writable用法
+```ts
+/**
+ * @author Leroy
+ * 全局商店
+ */
+import { writable } from 'svelte/store';
+
+
+/**
+ * writable: 可写对象
+ * 
+*/
+
+
+// 通过暴露语法暴露商店的对象
+export const count = writable(0);
+```
+订阅subscribe
+```vue
+<script>
+	import { count } from '../../store/stores';
+
+	let s = 0;
+	count.subscribe((value) => {
+		s = value;
+	});
+
+	const hanleSub = () => {
+		count.update((v) => v - 1);
+	};
+	const hanleAdd = () => {
+		count.update((v) => v + 1);
+	};
+
+
+
+
+</script>
+
+<button on:click={hanleAdd}>加一</button>
+<button on:click={hanleSub}>减一</button>
+<button on:click={() => count.set(0)}>重置为0</button>
+<p>子组件观察框:{s}</p>
+
+```
+简写订阅
+```vue
+<script>
+	import { count } from '../../store/stores';
+
+  // 这个写法已经不流行
+	// let s = 0;
+	// count.subscribe((value) => {
+	// 	s = value;
+	// });
+
+	const hanleSub = () => {
+		count.update((v) => v - 1);
+	};
+	const hanleAdd = () => {
+		count.update((v) => v + 1);
+	};
+
+
+  
+
+</script>
+
+<button on:click={hanleAdd}>加一</button>
+<button on:click={hanleSub}>减一</button>
+<button on:click={() => count.set(0)}>重置为0</button>
+<!-- 直接$ 订阅即可, 还减少了内存泄漏 -->
+<p>子组件观察框:{$count}</p>
+
+```
+
+##### readable用法
+```ts
+// 只读对象，参数意义：第一个参数是存储的初始值，第二个函数本质是获取了writable()之后的对象，将set, update方法映射出来
+export const time = readable(new Date(), (set, update) => {
+	// 设置循环函数
+	const interval = setInterval(() => {
+		set(new Date());
+	}, 1000);
+
+	// 记得取消副作用
+	return () => clearInterval(interval);
+});
+```
+
+##### derived派生方法
+```ts
+// 派生对象
+const start: any = new Date();
+export const elapsed = derived(time, ($time: any) => {
+  // 如果不使用set，update等功能，则可以直接返回值
+	return Math.round(($time - start) / 1000);
+});
+
+// 测试派生对象的初始值
+export const countFake = derived(
+	count,
+	($a, set) => {
+		// 这里会监听count的变换，持续执行
+		setTimeout(() => set($a * 2), 3000);
+	},
+	2000
+);
+
+```
+
+用法
+```vue
+<script>
+	import { time, elapsed, countFake } from '../../store/stores';
+
+	// 日期格式化
+	const formatter = new Intl.DateTimeFormat('en', {
+		hour12: true,
+		hour: 'numeric',
+		minute: '2-digit',
+		second: '2-digit'
+	});
+</script>
+
+
+
+<h1>The time is {formatter.format($time)}</h1>
+<p>
+	This page has been open for
+	{$elapsed}
+	{$elapsed === 1 ? 'second' : 'seconds'}
+</p>
+
+<p>
+  {$countFake}
+</p>
+
+```
+
+##### custom自定义商店
+```ts
+// 自定义商店
+function createCount() {
+  /**
+   * 这里的可玩性就非常高了
+   * 
+  */
+	const { subscribe, set, update } = writable(99);
+
+	return {
+		subscribe,
+		increment: () => update((n) => n + 1),
+		decrement: () => update((n) => n - 1),
+		reset: () => set(0)
+	};
+}
+export const customCount = createCount();
+```
+
+```vue
+<div style="background-color: skyblue;">
+	<h1>The count is {$customCount}</h1>
+	<button on:click={customCount.increment}>+</button>
+	<button on:click={customCount.decrement}>-</button>
+	<button on:click={customCount.reset}>reset</button>
+</div>
+```
+
+##### store对象bing
+这是一种简易用法，可以快速实现dom和store保持同步.
+```vue
+<script>
+import { count } from '../../store/stores';
+</script>
+<input type="range" max="100" min="0" bind:value={$count} />
+<button on:click={() => ($count += 10)}> Add exclamation mark! </button>
+```
+stores.ts
+```ts
+import { derived, readable, writable } from 'svelte/store';
+
+/**
+ * writable: 可写对象
+ * readable: 只读对象
+ * derived；派生都西昂
+ * ()=>{}: 自定义对象
+ */
+
+
+// 通过暴露语法暴露商店的对象
+export const count = writable(0);
+```
+#### ★进阶组件编辑
+
+
 
 
 
