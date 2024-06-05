@@ -1009,6 +1009,183 @@ export const count = writable(0);
 ```
 #### ★进阶组件编辑
 
+##### Motion 运动对象
+做动画专用, 内置多种动作算法.
+
+###### tweened
+```vue
+<script lang="ts">
+	// import { writable } from 'svelte/store';
+	// const progress = writable(0);
+
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
+	import Spring from './Spring.svelte';
+
+	// tweened 创建了一个高级的运动对象
+	const progress = tweened(0, {
+		duration: 5000,
+		easing: cubicOut
+	});
+</script>
+
+<h1>进阶用法</h1>
+<!-- <progress value={$progress}></progress>
+<button on:click={() => progress.set(0)}> 0% </button>
+<button on:click={() => progress.set(0.25)}> 25% </button>
+<button on:click={() => progress.set(0.5)}> 50% </button>
+<button on:click={() => progress.set(0.75)}> 75% </button>
+<button on:click={() => progress.set(1)}> 100% </button> -->
+
+<Spring></Spring>
+
+
+<!-- <style>
+	progress {
+		display: block;
+		width: 100%;
+	}
+</style> -->
+
+```
+###### spring
+```vue
+<script>
+	// import { writable } from 'svelte/store';
+
+	// let coords = writable({ x: 50, y: 50 });
+	// let size = writable(10);
+	import { spring } from 'svelte/motion';
+  // 使用这个就可以设置阻尼器了
+	let coords = spring(
+		{ x: 50, y: 50 },
+		{
+      // 僵直系数
+			stiffness: 0.1,
+      // 阻尼
+			damping: 0.25
+		}
+	);
+  let size = spring(10);
+</script>
+
+<svg
+	on:mousemove={(e) => {
+		coords.set({ x: e.clientX, y: e.clientY });
+	}}
+	on:mousedown={() => size.set(30)}
+	on:mouseup={() => size.set(10)}
+	role="presentation"
+>
+	<circle cx={$coords.x} cy={$coords.y} r={$size} />
+</svg>
+
+<!--  -->
+<div class="controls">
+	<label>
+		<h3>stiffness ({coords.stiffness})</h3>
+		<input bind:value={coords.stiffness} type="range" min="0.01" max="1" step="0.01" />
+	</label>
+
+	<label>
+		<h3>damping ({coords.damping})</h3>
+		<input bind:value={coords.damping} type="range" min="0.01" max="1" step="0.01" />
+	</label>
+</div>
+
+<style>
+	svg {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+	}
+
+	circle {
+		fill: #ff3e00;
+	}
+
+	.controls {
+		position: absolute;
+		top: 1em;
+		right: 1em;
+		width: 200px;
+		user-select: none;
+	}
+
+	.controls input {
+		width: 100%;
+	}
+</style>
+
+```
+
+##### Transitions 缓动 & animate 动画
+为真实dom快捷添加缓动和动画，用法挺多。
+自己学习去吧。
+
+`svelteLearning\my-app\src\routes\advanced\+page.svelte`
+
+```vue
+<script lang="ts">
+	// import { writable } from 'svelte/store';
+	// const progress = writable(0);
+
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
+	import Spring from './Spring.svelte';
+	import Fade from './Fade.svelte';
+	import CusCss from './CusCSS.svelte';
+	import CusJS from './CusJS.svelte';
+	import Trans from './Trans.svelte';
+	import Global from './Global.svelte';
+	import KeyBlock from './KeyBlock.svelte';
+	import Deferred from './Deferred.svelte';
+
+	// tweened 创建了一个高级的运动对象
+	const progress = tweened(0, {
+		duration: 5000,
+		easing: cubicOut
+	});
+</script>
+
+<h1>进阶用法</h1>
+<!-- <progress value={$progress}></progress>
+<button on:click={() => progress.set(0)}> 0% </button>
+<button on:click={() => progress.set(0.25)}> 25% </button>
+<button on:click={() => progress.set(0.5)}> 50% </button>
+<button on:click={() => progress.set(0.75)}> 75% </button>
+<button on:click={() => progress.set(1)}> 100% </button> -->
+
+<!-- <Spring></Spring> -->
+
+<!-- transition -->
+<!-- <Fade></Fade> -->
+<!-- <CusCss></CusCss> -->
+<!-- <CusJS></CusJS> -->
+<!-- <Trans></Trans> -->
+<!-- <Global></Global> -->
+<!-- <KeyBlock></KeyBlock> -->
+<!-- 平滑过渡 -->
+<Deferred></Deferred>
+
+
+
+
+<!-- <style>
+	progress {
+		display: block;
+		width: 100%;
+	}
+</style> -->
+
+```
+
+##### Actions 
+
+
+
 
 
 
