@@ -22,7 +22,7 @@
 	}
 
 	onMount(() => {
-		// 获取dom的参数
+		// 获取dom的2d对象
 		context = canvas.getContext('2d');
 		function resize() {
 			// 直接设置canvas大小为整个视口界面
