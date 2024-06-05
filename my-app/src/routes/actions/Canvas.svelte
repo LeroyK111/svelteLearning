@@ -29,7 +29,7 @@
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 		}
-
+		
 		// 监听视口变换，canvas直接跟随变换
 		window.addEventListener('resize', resize);
 		resize();
