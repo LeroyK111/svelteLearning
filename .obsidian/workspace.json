@@ -4,15 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "41922b7ac329096f",
+        "id": "c1563c2341dd9a03",
         "type": "tabs",
         "children": [
           {
-            "id": "5f0d8359f3887555",
+            "id": "c6f0f274c435520e",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -82,6 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -98,6 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -119,7 +125,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "README.md"
+              }
             }
           }
         ],
@@ -139,51 +147,52 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "5f0d8359f3887555",
+  "active": "c6f0f274c435520e",
   "lastOpenFiles": [
-    "README.md",
-    "my-app/vite.config.ts.timestamp-1717573239260-d2ef715b57011.mjs",
-    "my-app/src/routes/actions/actions.ts",
-    "my-app/src/routes/actions/Canvas.svelte",
-    "my-app/src/routes/actions/+page.svelte",
-    "my-app/src/routes/actions",
-    "my-app/vite.config.ts.timestamp-1717570436505-1e7c88d6aafa.mjs",
     "my-app/src/routes/advanced/todos.ts",
-    "my-app/node_modules/eslint/lib/shared/serialization.js",
-    "my-app/node_modules/fastq/package.json",
-    "my-app/node_modules/run-parallel/index.js",
+    "my-app/src/routes/advanced/Trans.svelte",
+    "my-app/src/routes/advanced/TodoList.svelte",
+    "my-app/src/routes/advanced/Spring.svelte",
+    "my-app/src/routes/advanced/KeyBlock.svelte",
+    "my-app/src/routes/advanced/Global.svelte",
+    "my-app/src/routes/advanced/Fade.svelte",
+    "my-app/src/routes/advanced/Deferred.svelte",
+    "my-app/src/routes/advanced/CusJS.svelte",
+    "my-app/src/routes/advanced/CusCSS.svelte",
+    "my-app/src/routes/advanced/+page.svelte",
     "my-app/src/assets/svelte-logo-mask.svg",
-    "my-app/node_modules/marked/README.md",
-    "my-app/node_modules/marked/man/marked.1.md",
-    "my-app/node_modules/marked/LICENSE.md",
+    "my-app/node_modules/typescript/SECURITY.md",
+    "my-app/node_modules/typescript/README.md",
+    "my-app/node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch/README.md",
+    "my-app/node_modules/@eslint/eslintrc/README.md",
+    "my-app/node_modules/@eslint/eslintrc/node_modules/globals/readme.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/README.md",
+    "my-app/node_modules/@sveltejs/vite-plugin-svelte/node_modules/svelte-hmr/README.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/type-annotation-spacing.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/space-infix-ops.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/space-before-function-paren.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/space-before-blocks.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/semi.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/quotes.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/padding-line-between-statements.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/object-curly-spacing.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/no-extra-semi.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/no-extra-parens.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/member-delimiter-style.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/lines-between-class-members.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/lines-around-comment.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/keyword-spacing.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/key-spacing.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/indent.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/func-call-spacing.md",
+    "my-app/node_modules/@typescript-eslint/eslint-plugin/docs/rules/comma-spacing.md",
+    "my-app/node_modules/playwright-core/lib/vite/traceViewer/playwright-logo.svg",
+    "my-app/node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg",
+    "my-app/node_modules/playwright-core/lib/server/chromium/appIcon.png",
     "my-app/src/assets/mylog.png",
     "my-app/assets/mylog.png",
     "my-app/public/mylog.png",
     "readme.assets/Pasted image 20240531142326.png",
-    "my-app/node_modules/playwright/README.md",
-    "my-app/node_modules/svelte-check/README.md",
-    "my-app/node_modules/playwright-core/lib/vite/traceViewer/playwright-logo.svg",
-    "my-app/node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg",
-    "my-app/node_modules/playwright-core/lib/server/chromium/appIcon.png",
-    "my-app/node_modules/eslint/README.md",
-    "my-app/node_modules/vite/README.md",
-    "my-app/node_modules/vite/LICENSE.md",
-    "my-app/node_modules/acorn-typescript/README.md",
-    "my-app/node_modules/acorn-typescript/CHANGELOG.md",
-    "my-app/node_modules/vitest/README.md",
-    "my-app/node_modules/vitest/LICENSE.md",
-    "my-app/node_modules/svelte/LICENSE.md",
-    "my-app/node_modules/svelte/README.md",
-    "my-app/node_modules/sade/readme.md",
-    "my-app/node_modules/@vitest/runner/node_modules/yocto-queue/readme.md",
-    "my-app/node_modules/detect-indent/readme.md",
-    "my-app/node_modules/@eslint/eslintrc/node_modules/globals/readme.md",
-    "my-app/node_modules/@sveltejs/kit/src/types/synthetic/$lib.md",
-    "my-app/node_modules/@sveltejs/kit/src/types/synthetic/$env+static+public.md",
-    "my-app/node_modules/@sveltejs/kit/src/types/synthetic/$env+static+private.md",
-    "my-app/node_modules/@sveltejs/kit/src/types/synthetic/$env+dynamic+private.md",
-    "my-app/node_modules/@sveltejs/kit/src/types/synthetic/$env+dynamic+public.md",
-    "my-app/node_modules/@sveltejs/adapter-auto/README.md",
     "my-app/static/favicon.png"
   ]
 }
