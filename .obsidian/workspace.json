@@ -149,6 +149,8 @@
   },
   "active": "c6f0f274c435520e",
   "lastOpenFiles": [
+    "my-app/src/hooks.server.ts",
+    "my-app/src/routes/+error.svelte",
     "my-app/vite.config.ts.timestamp-1717988166607-63f5857de86f9.mjs",
     "my-app/vite.config.ts.timestamp-1717957738398-db854e2fe091e.mjs",
     "my-app/vite.config.ts.timestamp-1717957601542-d37a3e86c73f7.mjs",
@@ -161,8 +163,6 @@
     "my-app/node_modules/marked/package.json",
     "my-app/node_modules/marked/lib/marked.cjs.map",
     "my-app/node_modules/marked/lib/marked.umd.js",
-    "my-app/node_modules/marked/bin/marked.js",
-    "my-app/node_modules/marked/marked.min.js",
     "my-app/src/assets/svelte-logo-mask.svg",
     "my-app/node_modules/typescript/SECURITY.md",
     "my-app/node_modules/typescript/README.md",
