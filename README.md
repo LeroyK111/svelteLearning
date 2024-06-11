@@ -1182,10 +1182,825 @@ export const count = writable(0);
 
 ```
 
-##### Actions 
+#### Actions 
+自定义事件。
+##### use的用法
+```vue
+<script context="module" lang="ts">
+	/**
+	 * @author Leroy
+	 * 同一个模块中使用多个script标签
+	 */
+	console.log(111);
+	const test = (msg: number | string = 222) => {
+		console.log(msg);
+	};
+
+	// 如果其他svelte想要调用则需要单独暴露
+	export { test };
+</script>
+
+<script lang="ts">
+	/**
+	 * @author Leroy
+	 * 使用canvas画布，构建图层
+	 */
+	import Canvas from './Canvas.svelte';
+	import { trapFocus } from './actions';
+
+	// 画笔颜色种类
+	const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'white', 'black'];
+	// 默认选中red
+	let selected = colors[0];
+	// 画笔粗细
+	let size = 10;
+	// 菜单展示
+	let showMenu = true;
+
+	// js分块
+	test();
+
+	// 获取 canvas 组件级别的对象，然后调用暴露的方法 
+	let canvas: any;
+
+</script>
 
 
 
+<div class="container">
+	<!-- 画布大小 -->
+	<Canvas bind:this={canvas} color={selected} {size} />
+
+	<!-- 菜单dom -->
+	{#if showMenu}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- 遮罩层, 事件绑定的定义域 -->
+		<div
+			class="modal-background"
+			on:click|self={() => (showMenu = false)}
+			on:keydown={(e) => {
+				if (e.key === 'Escape') showMenu = false;
+			}}
+		>
+			<!-- 在 Svelte 中，use: 指令用于将一个动作（action）应用到一个元素上。动作是一种用于封装与 DOM 元素交互逻辑的机制，可以在元素被创建时执行某些操作，并在元素被移除时进行清理。它们通常用于处理需要直接操作 DOM 的场景，例如设置焦点、创建图表、注册事件等。 -->
+			<div class="menu" use:trapFocus>
+				<div class="colors">
+					{#each colors as color}
+						<button
+							class="color"
+							aria-label={color}
+							aria-current={selected === color}
+							style="--color: {color}"
+							on:click={() => {
+								selected = color;
+							}}
+						></button>
+					{/each}
+				</div>
+
+				<label>
+					small
+					<input type="range" bind:value={size} min="1" max="50" />
+					large
+				</label>
+			</div>
+		</div>
+	{/if}
+
+	<!-- 菜单按钮 -->
+	<div class="controls">
+		<button class="show-menu" on:click={() => (showMenu = !showMenu)}>
+			{showMenu ? 'close' : 'menu'}
+		</button>
+		<button class="show-menu" on:click={() => canvas.clear()}>
+			clear
+		</button>
+	</div>
+</div>
+
+<style lang="scss">
+	.container {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		.controls {
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: 1em;
+		}
+	}
+
+	.show-menu {
+		width: 5em;
+		height: 3em;
+		background-color: skyblue;
+		border: none;
+		color: #fff;
+		font-weight: bold;
+	}
+
+	.modal-background {
+		position: fixed;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		backdrop-filter: blur(20px);
+	}
+
+	.menu {
+		position: relative;
+		background: var(--bg-2);
+		width: calc(100% - 2em);
+		max-width: 28em;
+		padding: 1em 1em 0.5em 1em;
+		border-radius: 1em;
+		box-sizing: border-box;
+		user-select: none;
+	}
+
+	.colors {
+		display: grid;
+		align-items: center;
+		grid-template-columns: repeat(9, 1fr);
+		grid-gap: 0.5em;
+	}
+
+	.color {
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: var(--color, #fff);
+		transform: none;
+		filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.2));
+		transition: all 0.1s;
+	}
+
+	.color[aria-current='true'] {
+		transform: translate(1px, 1px);
+		filter: none;
+		box-shadow: inset 3px 3px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.menu label {
+		display: flex;
+		width: 100%;
+		margin: 1em 0 0 0;
+	}
+
+	.menu input {
+		flex: 1;
+	}
+</style>
+
+```
+```vue
+
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { test } from './+page.svelte';
+
+	test('外来模块用法');
+
+	// 接受参数
+	export let color;
+	export let size;
+
+	let canvas: HTMLCanvasElement;
+	let context: any;
+	let previous: any;
+
+	function get_coords(e) {
+		// 获取鼠标的绝对坐标
+		const { clientX, clientY } = e;
+		// console.log('鼠标绝对坐标系', Math.trunc(clientX), Math.trunc(clientY));
+
+		// 画板的绝对坐标
+		const { left, top } = canvas.getBoundingClientRect();
+		// 求出鼠标在画板上的相对坐标系
+		const x = clientX - left;
+		const y = clientY - top;
+		return { x, y };
+	}
+
+	export function clear() {
+		// 清除画布
+		context.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+	onMount(() => {
+		// 获取dom的2d对象
+		context = canvas.getContext('2d');
+		function resize() {
+			// 直接设置canvas大小为整个视口界面
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+		}
+
+		// 监听视口变换，canvas直接跟随变换
+		window.addEventListener('resize', resize);
+		resize();
+
+		return () => {
+			window.removeEventListener('resize', resize);
+		};
+	});
+</script>
+
+<canvas
+	bind:this={canvas}
+	on:pointerdown={(e) => {
+		console.log('鼠标点击');
+
+		// 鼠标点下事件
+		const coords = get_coords(e);
+		// 填充颜色
+		context.fillStyle = color;
+		// 开始绘制
+		context.beginPath();
+		// 绘制圆心
+		context.arc(coords.x, coords.y, size / 2, 0, 2 * Math.PI);
+		// 填充
+		context.fill();
+
+		// 记录一下颜色
+		previous = coords;
+	}}
+	on:pointerleave={() => {
+		// 鼠标离开
+		previous = null;
+		console.log('鼠标离开');
+	}}
+	on:pointermove={(e) => {
+		// 鼠标移动事件
+		const coords = get_coords(e);
+		console.log(e.buttons);
+
+		if (e.buttons === 1) {
+			// 移动并且 鼠标左键点下
+			// 阻止事件传递
+			e.preventDefault();
+			// 画笔开始作画
+			// 绘制线条颜色
+			context.strokeStyle = color;
+			// 线条粗细
+			context.lineWidth = size;
+			// 线条末端为圆形
+			context.lineCap = 'round';
+			// 开始一条新路径
+			context.beginPath();
+			// 将绘制的起点移动到坐标
+			context.moveTo(previous.x, previous.y);
+			// 从当前点绘制一条直线到坐标
+			context.lineTo(coords.x, coords.y);
+			// 根据当前的描边样式绘制路径
+			context.stroke();
+		}
+		previous = coords;
+	}}
+></canvas>
+
+<!-- 鼠标指引表示 -->
+{#if previous}
+	<div
+		class="preview"
+		style="--color: {color}; --size: {size}px; --x: {previous.x}px; --y: {previous.y}px"
+	></div>
+{/if}
+
+<style>
+	canvas {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.preview {
+		position: absolute;
+		left: var(--x);
+		top: var(--y);
+		width: var(--size);
+		height: var(--size);
+		transform: translate(-50%, -50%);
+		background: var(--color);
+		border-radius: 50%;
+		opacity: 0.5;
+		pointer-events: none;
+	}
+</style>
+
+```
+```ts
+/**
+ * @author Leroy
+ * 借助use：绑定到dom上
+ */
+
+export function trapFocus(node: HTMLDivElement) {
+	// 是一个只读属性，它返回当前文档中获得焦点的元素
+	const previous = document.activeElement as HTMLElement;
+
+	console.log('use: 绑定的dom节点', node);
+
+	function focusable(): [HTMLElement] {
+		/**
+		 * 这个函数 focusable 用于获取指定节点（node）中所有可以获得焦点的元素，并返回它们的数组。
+		 *
+		 *
+		 */
+		return Array.from(
+			// 炸掉所有符合button标签, href属性等内容的dom元素
+			node.querySelectorAll(
+				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+			)
+		);
+	}
+
+	function handleKeydown(event: { key: string; shiftKey: any; preventDefault: () => void }) {
+		/**
+		 * 按下tab后的选择
+		 *
+		 */
+
+		if (event.key !== 'Tab') return;
+		// 当前被选中的dom元素
+		const current = document.activeElement;
+		// 获取菜单中的所有元素
+		const elements = focusable();
+		console.log(elements);
+		// 获取首尾两个元素
+		const first = elements.at(0) as HTMLElement;
+		const last = elements.at(-1) as HTMLElement;
+
+		console.log(event.shiftKey);
+		
+		// 让 tab 的聚焦循环起来
+		if (event.shiftKey && current === first) {
+			last.focus();
+			event.preventDefault();
+		}
+
+		if (!event.shiftKey && current === last) {
+			first.focus();
+			event.preventDefault();
+		}
+	}
+
+	// 默认聚焦第一个选型
+	focusable()[0]?.focus();
+
+	// 给整个菜单node绑定一个键盘事件
+	node.addEventListener('keydown', handleKeydown);
+
+	return {
+		// 事件销毁
+		destroy() {
+			node.removeEventListener('keydown', handleKeydown);
+			previous.focus();
+		}
+	};
+}
+
+```
+
+
+##### update的副作用用法
+update 回调：当 action 的参数发生变化时，Svelte 会调用 update 回调。你可以在这里更新工具提示的属性。
+destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于清理工具提示。
+```vue
+<script lang="ts">
+	import tippy, { type MultipleTargets, type Props } from 'tippy.js';
+	import 'tippy.js/dist/tippy.css';
+	import 'tippy.js/themes/material.css';
+
+	let content = 'Hello!';
+
+	function tooltip(node: MultipleTargets | HTMLButtonElement, options: Partial<Props> | undefined) {
+    console.log('传递的参数', options);
+
+    // 浮动事件
+		const tooltip = tippy(node, options);
+
+		return {
+      // update 回调
+			update(options: any) {
+				tooltip.setProps(options);
+			},
+			destroy() {
+				tooltip.destroy();
+			}
+		};
+	}
+</script>
+
+<input bind:value={content} />
+
+<button use:tooltip={{ content, theme: 'material' }}> Hover me </button>
+```
+
+#### 高级绑定
+`svelteLearning/my-app/src/routes/advBing/+page.svelte`
+##### dom对象绑定
+```vue
+<script>
+	let html = '<p>Write some text!</p>';
+</script>
+
+<!-- 直接绑定dom，取出字符串 -->
+<div bind:innerHTML={html} contenteditable></div>
+
+<pre>{html}</pre>
+
+<style>
+  /* 索引 */
+	[contenteditable] {
+		padding: 0.5em;
+		border: 1px solid #eee;
+		border-radius: 4px;
+	}
+</style>
+```
+##### #each绑定
+```vue
+<script>
+	let todos = [
+		{ done: false, text: 'finish Svelte tutorial' },
+		{ done: false, text: 'build an app' },
+		{ done: false, text: 'world domination' }
+	];
+
+	function add() {
+    // 加入新参数
+		todos = todos.concat({
+			done: false,
+			text: ''
+		});
+	}
+
+	function clear() {
+    // 过滤被选中的
+		todos = todos.filter((t) => !t.done);
+	}
+
+  // 计算器
+	$: remaining = todos.filter((t) => !t.done).length;
+</script>
+
+<div class="centered">
+	<h1>todos</h1>
+
+	<ul class="todos">
+		{#each todos as todo}
+			<li class:done={todo.done}>
+        <!-- 直接绑定两个事件 -->
+				<input type="checkbox" bind:checked={todo.done} />
+				<input type="text" placeholder="What needs to be done?" bind:value={todo.text} />
+			</li>
+		{/each}
+	</ul>
+
+	<p>{remaining} remaining</p>
+
+	<button on:click={add}> Add new </button>
+
+	<button on:click={clear}> Clear completed </button>
+</div>
+
+<style>
+	.centered {
+		max-width: 20em;
+		margin: 0 auto;
+	}
+
+	.done {
+		opacity: 0.4;
+	}
+
+	li {
+		display: flex;
+	}
+
+	input[type='text'] {
+		flex: 1;
+		padding: 0.5em;
+		margin: -0.2em 0;
+		border: none;
+	}
+</style>
+```
+##### media 媒体绑定
+```vue
+<script>
+	import AudioPlayer from './AudioPlayer.svelte';
+	export const tracks = [
+		{
+			// https://musopen.org/music/9862-the-blue-danube-op-314/
+			src: 'https://learn.svelte.dev/assets/media/music/strauss.mp3',
+			title: 'The Blue Danube Waltz',
+			artist: 'Johann Strauss'
+		},
+
+		{
+			// https://musopen.org/music/43775-the-planets-op-32/
+			src: 'https://learn.svelte.dev/assets/media/music/holst.mp3',
+			title: 'Mars, the Bringer of War',
+			artist: 'Gustav Holst'
+		},
+
+		{
+			// https://musopen.org/music/8010-3-gymnopedies/
+			src: 'https://learn.svelte.dev/assets/media/music/satie.mp3',
+			title: 'Gymnopédie no. 1',
+			artist: 'Erik Satie'
+		},
+
+		{
+			// https://musopen.org/music/43683-requiem-in-d-minor-k-626/
+			src: 'https://learn.svelte.dev/assets/media/music/mozart.mp3',
+			title: 'Requiem in D minor, K. 626 - III. Sequence - Lacrymosa',
+			artist: 'Wolfgang Amadeus Mozart'
+		}
+	];
+
+
+</script>
+
+<div class="centered">
+	{#each tracks as track}
+		<AudioPlayer {...track} />
+	{/each}
+</div>
+
+<style>
+	.centered {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		justify-content: center;
+		gap: 0.5em;
+		max-width: 40em;
+		margin: 0 auto;
+	}
+</style>
+```
+##### 元素事件直接绑定
+```vue
+<script lang="ts">
+	let w: number;
+	let h: number;
+	let size = 42;
+	let text = 'edit this text';
+</script>
+
+<label>
+	<input type="range" bind:value={size} min="10" max="100" />
+	font size ({size}px)
+</label>
+
+<!-- 自己获取dom元素大小，然后修改w和h的值 -->
+<div bind:clientWidth={w} bind:clientHeight={h}>
+	<span style="font-size: {size}px" contenteditable>{text}</span>
+	<span class="size">{w} x {h} px</span>
+</div>
+
+<style>
+	div {
+		position: relative;
+		display: inline-block;
+		padding: 0.5rem;
+		background: hsla(15, 100%, 50%, 0.1);
+		border: 1px solid hsl(15, 100%, 50%);
+	}
+
+	.size {
+		position: absolute;
+		right: -1px;
+		bottom: -1.4em;
+		line-height: 1;
+		background: hsl(15, 100%, 50%);
+		color: white;
+		padding: 0.2em 0.5em;
+		white-space: pre;
+	}
+</style>
+```
+##### 组件传参绑定
+
+数据的双向绑定+事件的双向绑定
+
+```vue
+<script lang="ts">
+	import AdvancedBindings from '../../components/AdvancedBindings.svelte';
+	import AdvancedEach from '../../components/AdvancedEach.svelte';
+	import AdvancedMdia from '../../components/AdvancedMdia.svelte';
+	import AdvancedDim from '../../components/AdvancedDim.svelte';
+  import Keypad from './Keypad.svelte';
+
+
+	let pin: any;
+	$: view = pin ? pin.replace(/\d(?!$)/g, '•') : 'enter your pin';
+
+  $: {
+		console.log("pin值被改变了:", pin);
+	}
+
+	function handleSubmit() {
+		alert(`submitted ${pin}`);
+    
+	}
+</script>
+
+<!-- html绑定 -->
+<AdvancedBindings></AdvancedBindings>
+<!-- 循环绑定 -->
+<AdvancedEach></AdvancedEach>
+<!-- 这个牛逼，媒体绑定 -->
+<AdvancedMdia></AdvancedMdia>
+<!-- 测量包装元素 -->
+<AdvancedDim></AdvancedDim>
+<!-- 组件传参绑定 -->
+<h1 style="opacity: {pin ? 1 : 0.4}">
+	{view}
+</h1>
+<!-- 非常不推荐这么做，不使用on:submit，使用$props -->
+<Keypad bind:value={pin} on:submit={handleSubmit} />
+
+```
+
+#### css样式
+
+##### 简写写法
+```vue
+<script>
+	let flipped = false;
+</script>
+
+<div class="container">
+	Flip the card
+	<!-- 		class:flipped={flipped} 此指令的意思是“只要 flipped 真实，就添加 flipped 类”。 -->
+	<!-- 同名简写方式  -->
+	<button class="card" class:flipped on:click={() => (flipped = !flipped)}>
+		<div class="front">
+			<span class="symbol">♠</span>
+		</div>
+		<div class="back">
+			<div class="pattern"></div>
+		</div>
+	</button>
+</div>
+
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		perspective: 100vh;
+	}
+
+	.card {
+		position: relative;
+		aspect-ratio: 2.5 / 3.5;
+		font-size: min(1vh, 0.25rem);
+		height: 80em;
+		background: var(--bg-1);
+		border-radius: 2em;
+		transform: rotateY(180deg);
+		transition: transform 0.4s;
+		transform-style: preserve-3d;
+		padding: 0;
+		user-select: none;
+		cursor: pointer;
+	}
+
+	.card.flipped {
+		transform: rotateY(0);
+	}
+
+	.front,
+	.back {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		backface-visibility: hidden;
+		border-radius: 2em;
+		border: 1px solid var(--fg-2);
+		box-sizing: border-box;
+		padding: 2em;
+	}
+
+	.front {
+		background:
+			url(../../assets/svelte-logo.svg) no-repeat 5em 5em,
+			url(../../assets/svelte-logo.svg) no-repeat calc(100% - 5em) calc(100% - 5em);
+		background-size:
+			8em 8em,
+			8em 8em;
+	}
+
+	.back {
+		transform: rotateY(180deg);
+	}
+
+	.symbol {
+		font-size: 30em;
+		color: var(--fg-1);
+	}
+
+	.pattern {
+		width: 100%;
+		height: 100%;
+		background-color: var(--bg-2);
+		/* pattern from https://projects.verou.me/css3patterns/#marrakesh */
+		background-image: radial-gradient(var(--bg-3) 0.9em, transparent 1em),
+			repeating-radial-gradient(
+				var(--bg-3) 0,
+				var(--bg-3) 0.4em,
+				transparent 0.5em,
+				transparent 2em,
+				var(--bg-3) 2.1em,
+				var(--bg-3) 2.5em,
+				transparent 2.6em,
+				transparent 5em
+			);
+		background-size:
+			3em 3em,
+			9em 9em;
+		background-position: 0 0;
+		border-radius: 1em;
+	}
+</style>
+```
+
+##### 混合写法
+```vue
+
+<!-- 写法一 -->
+<button
+	class="card"
+	style="transform: {flipped ? 'rotateY(0)' : ''}; --bg-1: palegoldenrod; --bg-2: black; --bg-3: goldenrod"
+	on:click={() => flipped = !flipped}
+>
+
+<!-- 写法二 -->
+<button
+	class="card"
+	style:transform={flipped ? 'rotateY(0)' : ''}
+	style:--bg-1="palegoldenrod"
+	style:--bg-2="black"
+	style:--bg-3="goldenrod"
+	on:click={() => flipped = !flipped}
+>
+
+<!-- 支持style 和 class 混合写法 -->
+
+```
+
+##### 穿透写法
+```vue
+<script>
+	import Son from './Son.svelte';
+</script>
+
+<!-- 支持style 穿透 -->
+<div class="boxes">
+	<Son --color="red" />
+	<Son --color="green" />
+	<Son --color="blue" />
+</div>
+
+```
+
+```vue
+<div class="box"></div>
+
+<style>
+	.box {
+		width: 5em;
+		height: 5em;
+		border-radius: 0.5em;
+		margin: 0 0 1em 0;
+		background-color: var(--color, #ddd);
+	}
+</style>
+```
+
+
+#### 插槽slot
 
 
 
