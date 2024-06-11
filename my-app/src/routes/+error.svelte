@@ -13,5 +13,5 @@
 </script>
 
 <h1>{$page.status}</h1>
-<p>{($page.error as rule).message}</p>
-<p>error code: {($page.error as rule).code}</p>
+<p>{$page.error.message}</p>
+<p>error code: {$page.error.code}</p>
