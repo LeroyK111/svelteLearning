@@ -1190,4 +1190,4 @@ export const count = writable(0);
 
 
 
-### 全栈框架使用
+### kit全栈框架使用
