@@ -9,6 +9,7 @@
 		message: string;
 		code: string;
 	}
+	
 </script>
 
 <h1>{$page.status}</h1>

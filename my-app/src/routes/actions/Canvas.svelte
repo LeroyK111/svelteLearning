@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { test } from './+page.svelte';
+
+	test('外来模块用法');
 
 	export let color;
 	export let size;
@@ -29,7 +32,7 @@
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 		}
-		
+
 		// 监听视口变换，canvas直接跟随变换
 		window.addEventListener('resize', resize);
 		resize();

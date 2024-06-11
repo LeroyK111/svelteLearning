@@ -1,11 +1,16 @@
-export function trapFocus(node) {
+/**
+ * @author Leroy
+ * 借助use：绑定到dom上
+*/
+
+export function trapFocus(node: HTMLDivElement) {
 	const previous = document.activeElement;
 
 	function focusable() {
 		return Array.from(node.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'));
 	}
 
-	function handleKeydown(event) {
+	function handleKeydown(event: { key: string; shiftKey: any; preventDefault: () => void; }) {
 		if (event.key !== 'Tab') return;
 
 		const current = document.activeElement;
