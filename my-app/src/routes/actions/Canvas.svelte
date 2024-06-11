@@ -25,6 +25,11 @@
 		return { x, y };
 	}
 
+	export function clear() {
+		// 清除画布
+		context.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
 	onMount(() => {
 		// 获取dom的2d对象
 		context = canvas.getContext('2d');
@@ -43,7 +48,6 @@
 		};
 	});
 </script>
-
 
 <canvas
 	bind:this={canvas}
