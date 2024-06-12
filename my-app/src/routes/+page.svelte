@@ -2,6 +2,7 @@
 	// 需要大写
 	import Nested from '../components/Nested.svelte';
 	import Tem from '../components/Tem.svelte';
+	import { goto } from '$app/navigation';
 
 	let name = 'hello world';
 	let src = '/src/assets/mylog.png';
@@ -34,6 +35,8 @@
 	}
 </script>
 
+<button on:click={() => goto('/bind')}>点我跳转</button>
+
 <Tem></Tem>
 
 <!-- 模板语法{} -->
@@ -55,11 +58,8 @@
 
 <p>计算值 {doubled}</p>
 
-
 <!-- 组件引入 -->
 <Nested></Nested>
-
-
 
 <style>
 	h1 {
