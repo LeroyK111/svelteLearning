@@ -1650,7 +1650,6 @@ destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于�
 <input bind:value={content} />
 
 <button use:tooltip={{ content, theme: 'material' }}> Hover me </button>
-<<<<<<< HEAD
 
 ```
 
@@ -2050,7 +2049,1241 @@ destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于�
 
 
 #### 插槽slot
+这里的插槽居然可以通过 let： 回调参数。太帅了。
+
+`svelteLearning\my-app\src\routes\slot\+page.svelte`
+##### let: 关键字，插槽回调
+```vue
+<script lang="ts">
+	// import Card from './Card.svelte';
+
+	import FilterableList from './FilterableList.svelte';
+	import { colors } from './colors.js';
+
+	
+
+</script>
+
+<!-- <main> -->
+<!-- <Card> -->
+<!-- 插槽传递 -->
+<!-- <span>Patrick BATEMAN</span>
+		<span>Vice President</span>
+	</Card>
+</main> -->
 
 
+<!-- <Card>
+	<span>Patrick BATEMAN 测试</span>
+	<span>Vice President 测试</span>
+
+	<span slot="telephone">telephone具名</span>
+	<span slot="company">
+		company具名
+		<small>Mergers and Aquisitions</small>
+	</span>
+	<span slot="address">address具名</span
+	>
+</Card> -->
+
+<!-- 如果不传递任何插槽，则我们可以为Card组件添加默认值 -->
+<!-- <Card /> -->
+
+
+<!-- 使用以下 let: 可以接收到插槽传递回传的内容 -->
+<FilterableList
+	data={colors}
+	field="name"
+	let:item={row}
+>
+	<!-- <header slot="header" class="row" style="border: 1px solid black;">
+		<span class="color"></span>
+		<span class="name">name</span>
+		<span class="hex">hex</span>
+		<span class="rgb">rgb</span>
+		<span class="hsl">hsl</span>
+	</header> -->
+	
+
+
+	<div class="row">
+		<span class="color" style="background-color: {row.hex}"></span>
+		<span class="name">{row.name}</span>
+		<span class="hex">{row.hex}</span>
+		<span class="rgb">{row.rgb}</span>
+		<span class="hsl">{row.hsl}</span>
+	</div>
+</FilterableList>
+
+
+
+
+<!-- <style>
+	main {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		background: url(../../assets/svelte-logo.svg);
+	}
+</style> -->
+
+
+
+<style>
+	.row {
+		display: grid;
+		align-items: center;
+		grid-template-columns: 2em 4fr 3fr;
+		gap: 1em;
+		padding: 0.1em;
+		background: var(--bg-1);
+		border-radius: 0.2em;
+	}
+
+	header {
+		font-weight: bold;
+	}
+
+	.row:not(header):hover {
+		background: var(--bg-2);
+	}
+
+	.color {
+		aspect-ratio: 1;
+		height: 100%;
+		border-radius: 0.1em;
+	}
+
+	.rgb, .hsl {
+		display: none;
+	}
+
+	@media (min-width: 40rem) {
+		.row {
+			grid-template-columns: 2em 4fr 3fr 3fr;
+		}
+
+		.rgb {
+			display: block;
+		}
+	}
+
+	@media (min-width: 60rem) {
+		.row {
+			grid-template-columns: 2em 4fr 3fr 3fr 3fr;
+		}
+
+		.hsl {
+			display: block;
+		}
+	}
+</style>
+```
+
+`svelteLearning\my-app\src\routes\slot\Card.svelte`
+
+```vue
+<!-- <div class="card"> -->
+<!-- 普通插槽直接开 -->
+<!-- <slot /> -->
+<!-- </div> -->
+
+<!-- 命名插槽 -->
+<div class="card">
+	<header>
+		<slot name="telephone">
+			<i>没有电话哦</i>
+		</slot>
+		<slot name="company">
+			<i>没有公司</i>
+		</slot>
+	</header>
+
+	<footer>
+		<slot name="address">
+			<p>没有地址</p>
+		</slot>
+	</footer>
+	<!-- 如果没有默认插槽，则会提示异常， -->
+	<slot></slot>
+</div>
+
+<!-- <style>
+	@font-face {
+		src: url('/Garamond Classico SC Regular.woff2') format('woff2');
+		font-family: 'Silian Rail';
+		font-style: normal;
+		font-weight: 400;
+	}
+
+	.card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		font-size: min(2vw, 3.5vh, 1.5rem);
+		font-family: 'Silian Rail';
+		width: 24em;
+		aspect-ratio: 3.5 / 2.0;
+		background: url(../../assets/pause.svg) no-repeat 50% 50%;
+		background-size: cover;
+		border-radius: 2px;
+		filter: drop-shadow(0.1em 0.1em 0.1em rgba(0, 0, 0, 0.2));
+		padding: 1.5em 1em 1em 1em;
+		font-variant: small-caps;
+		text-shadow: -1px -1px 2px rgba(0, 0, 0, 0.2), 1px 1px 2px white;
+		color: hsl(50, 20%, 35%);
+		line-height: 1.2;
+	}
+
+	header, footer {
+		width: 100%;
+		display: flex;
+		flex: 1;
+	}
+
+	header {
+		justify-content: space-between;
+	}
+
+	footer {
+		font-size: 0.7em;
+		justify-content: center;
+		align-items: end;
+	}
+</style> -->
+
+```
+
+`svelteLearning\my-app\src\routes\slot\FilterableList.svelte`
+
+```vue
+<script>
+	export let data;
+	export let field;
+
+	let search = '';
+
+	$: regex = search ? new RegExp(search, 'i') : null;
+	// 过滤器
+	$: matches = (item) => (regex ? regex.test(item[field]) : true);
+</script>
+
+<div class="list">
+	<label>
+		<!-- 过滤器 -->
+		Filter: <input bind:value={search} />
+	</label>
+
+	<!-- 判断$$slots.header 是否存在，来决定插槽是否渲染。。。 -->
+	{#if $$slots.header}
+		<div class="header">
+			<slot name="header"></slot>
+		</div>
+	{/if}
+
+	<div class="content">
+		{#each data.filter(matches) as item}
+			<!-- 这里是插槽本身接收到了item参数，子传递给父，超越vue 和 react -->
+			<slot {item} />
+		{/each}
+	</div>
+</div>
+
+<style>
+	.list {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.header {
+		border-top: 1px solid var(--bg-2);
+		padding: 0.2em 0;
+	}
+
+	.content {
+		flex: 1;
+		overflow: auto;
+		padding-top: 0.5em;
+		border-top: 1px solid var(--bg-2);
+	}
+</style>
+
+```
+
+`svelteLearning\my-app\src\routes\slot\colors.js`
+
+```ts
+const data = [
+	{ hex: '#f0f8ff', name: 'AliceBlue' },
+	{ hex: '#faebd7', name: 'AntiqueWhite' },
+	{ hex: '#00ffff', name: 'Aqua' },
+	{ hex: '#7fffd4', name: 'Aquamarine' },
+	{ hex: '#f0ffff', name: 'Azure' },
+	{ hex: '#f5f5dc', name: 'Beige' },
+	{ hex: '#ffe4c4', name: 'Bisque' },
+	{ hex: '#000000', name: 'Black' },
+	{ hex: '#ffebcd', name: 'BlanchedAlmond' },
+	{ hex: '#0000ff', name: 'Blue' },
+	{ hex: '#8a2be2', name: 'BlueViolet' },
+	{ hex: '#a52a2a', name: 'Brown' },
+	{ hex: '#deb887', name: 'BurlyWood' },
+	{ hex: '#5f9ea0', name: 'CadetBlue' },
+	{ hex: '#7fff00', name: 'Chartreuse' },
+	{ hex: '#d2691e', name: 'Chocolate' },
+	{ hex: '#ff7f50', name: 'Coral' },
+	{ hex: '#6495ed', name: 'CornflowerBlue' },
+	{ hex: '#fff8dc', name: 'Cornsilk' },
+	{ hex: '#dc143c', name: 'Crimson' },
+	{ hex: '#00ffff', name: 'Cyan' },
+	{ hex: '#00008b', name: 'DarkBlue' },
+	{ hex: '#008b8b', name: 'DarkCyan' },
+	{ hex: '#b8860b', name: 'DarkGoldenRod' },
+	{ hex: '#a9a9a9', name: 'DarkGray' },
+	{ hex: '#a9a9a9', name: 'DarkGrey' },
+	{ hex: '#006400', name: 'DarkGreen' },
+	{ hex: '#bdb76b', name: 'DarkKhaki' },
+	{ hex: '#8b008b', name: 'DarkMagenta' },
+	{ hex: '#556b2f', name: 'DarkOliveGreen' },
+	{ hex: '#ff8c00', name: 'DarkOrange' },
+	{ hex: '#9932cc', name: 'DarkOrchid' },
+	{ hex: '#8b0000', name: 'DarkRed' },
+	{ hex: '#e9967a', name: 'DarkSalmon' },
+	{ hex: '#8fbc8f', name: 'DarkSeaGreen' },
+	{ hex: '#483d8b', name: 'DarkSlateBlue' },
+	{ hex: '#2f4f4f', name: 'DarkSlateGray' },
+	{ hex: '#2f4f4f', name: 'DarkSlateGrey' },
+	{ hex: '#00ced1', name: 'DarkTurquoise' },
+	{ hex: '#9400d3', name: 'DarkViolet' },
+	{ hex: '#ff1493', name: 'DeepPink' },
+	{ hex: '#00bfff', name: 'DeepSkyBlue' },
+	{ hex: '#696969', name: 'DimGray' },
+	{ hex: '#696969', name: 'DimGrey' },
+	{ hex: '#1e90ff', name: 'DodgerBlue' },
+	{ hex: '#b22222', name: 'FireBrick' },
+	{ hex: '#fffaf0', name: 'FloralWhite' },
+	{ hex: '#228b22', name: 'ForestGreen' },
+	{ hex: '#ff00ff', name: 'Fuchsia' },
+	{ hex: '#dcdcdc', name: 'Gainsboro' },
+	{ hex: '#f8f8ff', name: 'GhostWhite' },
+	{ hex: '#ffd700', name: 'Gold' },
+	{ hex: '#daa520', name: 'GoldenRod' },
+	{ hex: '#808080', name: 'Gray' },
+	{ hex: '#808080', name: 'Grey' },
+	{ hex: '#008000', name: 'Green' },
+	{ hex: '#adff2f', name: 'GreenYellow' },
+	{ hex: '#f0fff0', name: 'HoneyDew' },
+	{ hex: '#ff69b4', name: 'HotPink' },
+	{ hex: '#cd5c5c', name: 'IndianRed' },
+	{ hex: '#4b0082', name: 'Indigo' },
+	{ hex: '#fffff0', name: 'Ivory' },
+	{ hex: '#f0e68c', name: 'Khaki' },
+	{ hex: '#e6e6fa', name: 'Lavender' },
+	{ hex: '#fff0f5', name: 'LavenderBlush' },
+	{ hex: '#7cfc00', name: 'LawnGreen' },
+	{ hex: '#fffacd', name: 'LemonChiffon' },
+	{ hex: '#add8e6', name: 'LightBlue' },
+	{ hex: '#f08080', name: 'LightCoral' },
+	{ hex: '#e0ffff', name: 'LightCyan' },
+	{ hex: '#fafad2', name: 'LightGoldenRodYellow' },
+	{ hex: '#d3d3d3', name: 'LightGray' },
+	{ hex: '#d3d3d3', name: 'LightGrey' },
+	{ hex: '#90ee90', name: 'LightGreen' },
+	{ hex: '#ffb6c1', name: 'LightPink' },
+	{ hex: '#ffa07a', name: 'LightSalmon' },
+	{ hex: '#20b2aa', name: 'LightSeaGreen' },
+	{ hex: '#87cefa', name: 'LightSkyBlue' },
+	{ hex: '#778899', name: 'LightSlateGray' },
+	{ hex: '#778899', name: 'LightSlateGrey' },
+	{ hex: '#b0c4de', name: 'LightSteelBlue' },
+	{ hex: '#ffffe0', name: 'LightYellow' },
+	{ hex: '#00ff00', name: 'Lime' },
+	{ hex: '#32cd32', name: 'LimeGreen' },
+	{ hex: '#faf0e6', name: 'Linen' },
+	{ hex: '#ff00ff', name: 'Magenta' },
+	{ hex: '#800000', name: 'Maroon' },
+	{ hex: '#66cdaa', name: 'MediumAquaMarine' },
+	{ hex: '#0000cd', name: 'MediumBlue' },
+	{ hex: '#ba55d3', name: 'MediumOrchid' },
+	{ hex: '#9370db', name: 'MediumPurple' },
+	{ hex: '#3cb371', name: 'MediumSeaGreen' },
+	{ hex: '#7b68ee', name: 'MediumSlateBlue' },
+	{ hex: '#00fa9a', name: 'MediumSpringGreen' },
+	{ hex: '#48d1cc', name: 'MediumTurquoise' },
+	{ hex: '#c71585', name: 'MediumVioletRed' },
+	{ hex: '#191970', name: 'MidnightBlue' },
+	{ hex: '#f5fffa', name: 'MintCream' },
+	{ hex: '#ffe4e1', name: 'MistyRose' },
+	{ hex: '#ffe4b5', name: 'Moccasin' },
+	{ hex: '#ffdead', name: 'NavajoWhite' },
+	{ hex: '#000080', name: 'Navy' },
+	{ hex: '#fdf5e6', name: 'OldLace' },
+	{ hex: '#808000', name: 'Olive' },
+	{ hex: '#6b8e23', name: 'OliveDrab' },
+	{ hex: '#ffa500', name: 'Orange' },
+	{ hex: '#ff4500', name: 'OrangeRed' },
+	{ hex: '#da70d6', name: 'Orchid' },
+	{ hex: '#eee8aa', name: 'PaleGoldenRod' },
+	{ hex: '#98fb98', name: 'PaleGreen' },
+	{ hex: '#afeeee', name: 'PaleTurquoise' },
+	{ hex: '#db7093', name: 'PaleVioletRed' },
+	{ hex: '#ffefd5', name: 'PapayaWhip' },
+	{ hex: '#ffdab9', name: 'PeachPuff' },
+	{ hex: '#cd853f', name: 'Peru' },
+	{ hex: '#ffc0cb', name: 'Pink' },
+	{ hex: '#dda0dd', name: 'Plum' },
+	{ hex: '#b0e0e6', name: 'PowderBlue' },
+	{ hex: '#800080', name: 'Purple' },
+	{ hex: '#663399', name: 'RebeccaPurple' },
+	{ hex: '#ff0000', name: 'Red' },
+	{ hex: '#bc8f8f', name: 'RosyBrown' },
+	{ hex: '#4169e1', name: 'RoyalBlue' },
+	{ hex: '#8b4513', name: 'SaddleBrown' },
+	{ hex: '#fa8072', name: 'Salmon' },
+	{ hex: '#f4a460', name: 'SandyBrown' },
+	{ hex: '#2e8b57', name: 'SeaGreen' },
+	{ hex: '#fff5ee', name: 'SeaShell' },
+	{ hex: '#a0522d', name: 'Sienna' },
+	{ hex: '#c0c0c0', name: 'Silver' },
+	{ hex: '#87ceeb', name: 'SkyBlue' },
+	{ hex: '#6a5acd', name: 'SlateBlue' },
+	{ hex: '#708090', name: 'SlateGray' },
+	{ hex: '#708090', name: 'SlateGrey' },
+	{ hex: '#fffafa', name: 'Snow' },
+	{ hex: '#00ff7f', name: 'SpringGreen' },
+	{ hex: '#4682b4', name: 'SteelBlue' },
+	{ hex: '#d2b48c', name: 'Tan' },
+	{ hex: '#008080', name: 'Teal' },
+	{ hex: '#d8bfd8', name: 'Thistle' },
+	{ hex: '#ff6347', name: 'Tomato' },
+	{ hex: '#40e0d0', name: 'Turquoise' },
+	{ hex: '#ee82ee', name: 'Violet' },
+	{ hex: '#f5deb3', name: 'Wheat' },
+	{ hex: '#ffffff', name: 'White' },
+	{ hex: '#f5f5f5', name: 'WhiteSmoke' },
+	{ hex: '#ffff00', name: 'Yellow' },
+	{ hex: '#9acd32', name: 'YellowGreen' }
+];
+
+export const colors = data.map(({ hex, name }) => {
+	// calculate rgb
+	let r = parseInt(hex.slice(1, 3), 16);
+	let g = parseInt(hex.slice(3, 5), 16);
+	let b = parseInt(hex.slice(5, 7), 16);
+
+	const rgb = `rgb(${r}, ${g}, ${b})`;
+
+	// calculate hsl
+	r /= 255;
+	g /= 255;
+	b /= 255;
+
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+
+	let h = 0;
+	let s = 0;
+	const l = (max + min) / 2;
+
+	if (max > min) {
+		const d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+		switch (max) {
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+			case g: h = (b - r) / d + 2; break;
+			case b: h = (r - g) / d + 4; break;
+		}
+
+		h /= 6;
+	}
+
+	const hsl = `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+
+	return {
+		name,
+		hex,
+		rgb,
+		hsl
+	};
+});
+```
+
+#### 上下文传递Context
+利用getContext 和 setContext 可以做到组件之间和组件插槽之间相互的函数和数据传递。可以轻易的利用闭包特点。
+`svelteLearning\my-app\src\routes\context\+page.svelte`
+```vue
+<script>
+	import Canvas from './Canvas.svelte';
+	import Square from './Square.svelte';
+
+	// we use a seeded random number generator to get consistent jitter
+	let seed = 2;
+  // 随机数种子
+	function random() {
+		seed *= 16807;
+		seed %= 2147483647;
+		return (seed - 1) / 2147483646;
+	}
+
+  // 
+	function jitter(amount) {
+		return amount * (random() - 0.5);
+	}
+</script>
+
+<div class="container">
+	<Canvas width={800} height={1200}>
+		{#each Array(12) as _, c}
+			{#each Array(22) as _, r}
+				<Square
+					x={180 + c * 40 + jitter(r * 2)}
+					y={180 + r * 40 + jitter(r * 2)}
+					size={40}
+					rotate={jitter(r * 0.05)}
+				/>
+			{/each}
+		{/each}
+	</Canvas>
+</div>
+
+<style>
+	.container {
+		height: 100%;
+		aspect-ratio: 2 / 3;
+		margin: 0 auto;
+		background: rgb(224, 219, 213);
+		filter: drop-shadow(0.5em 0.5em 1em rgba(0, 0, 0, 0.1));
+	}
+</style>
+```
+`svelteLearning\my-app\src\routes\context\Canvas.svelte`
+```vue
+<script>
+	// @ts-nocheck
+	import { setContext, afterUpdate, onMount, tick } from 'svelte';
+
+	export let width = 100;
+	export let height = 100;
+
+	let canvas, ctx;
+	let items = new Set();
+	let scheduled = false;
+
+	onMount(() => {
+		// 赋予canvas句柄
+		ctx = canvas.getContext('2d');
+	});
+
+	// 有点临时全局状态的感觉，这里我们封装了一个函数, 所有的插槽和子组件都可以获取函数
+	// 与生命周期函数类似， setContext getContext 必须在组件初始化期间调用。
+	setContext('canvas', {
+		addItem
+	});
+
+	function addItem(fn) {
+		// 支持hooks语法，可以复用生命周期
+		onMount(() => {
+			items.add(fn);
+			return () => items.delete(fn);
+		});
+		// 数据更新之后
+		afterUpdate(async () => {
+			if (scheduled) return;
+			
+			scheduled = true;
+			await tick();
+			scheduled = false;
+
+			// 开始绘图
+			draw();
+		});
+	}
+
+	function draw() {
+		ctx.clearRect(0, 0, width, height);
+		items.forEach(fn => fn(ctx));
+	}
+</script>
+
+<canvas bind:this={canvas} {width} {height}>
+	<slot />
+</canvas>
+
+<style>
+	canvas {
+		width: 100%;
+		height: 100%;
+	}
+</style>
+```
+`svelteLearning\my-app\src\routes\context\Square.svelte`
+```vue
+<script>
+	// @ts-nocheck
+	import { getContext } from 'svelte';
+	/**
+	 * {#each Array(12) as _, c}
+			{#each Array(22) as _, r}
+				<Square
+					x={180 + c * 40 + jitter(r * 2)}
+					y={180 + r * 40 + jitter(r * 2)}
+					size={40}
+					rotate={jitter(r * 0.05)}
+				/>
+			{/each}
+		{/each}
+	 * 
+	*/
+	// 
+	export let x;
+	export let y;
+	export let size;
+	export let rotate;
+
+	// 调用父组件的函数
+	getContext('canvas').addItem(draw);
+
+	function draw(ctx) {
+		// 非常取巧，这里使用了闭包的技巧，ctx是父组件的变量
+		ctx.save();
+		// 移动位置
+		ctx.translate(x, y);
+		// 旋转角度
+		ctx.rotate(rotate);
+		// 边框颜色
+		ctx.strokeStyle = 'black';
+		// 绘制矩形
+		ctx.strokeRect(-size / 2, -size / 2, size, size);
+		// 恢复之前的绘图状态
+		ctx.restore();
+	}
+</script>
+```
+
+#### 组件特殊关键字
+
+##### svelte:self 自我递归组件
+`svelteLearning\my-app\src\routes\componentKey\Folder.svelte`
+```vue
+<script>
+	import File from './File.svelte';
+
+	// 展开默认值关闭
+	export let expanded = false;
+	export let name;
+	export let files;
+
+	function toggle() {
+		expanded = !expanded;
+	}
+</script>
+
+<button class:expanded on:click={toggle}>{name}</button>
+
+{#if expanded}
+	<ul>
+		{#each files as file}
+			<li>
+				{#if file.files}
+					<!-- <Folder {...file}/> 无法自我导入 -->
+					<!-- 自己复用自己的组件，则我们可以这样做，自我递归组件 -->
+					<svelte:self {...file} />
+				{:else}
+					<File {...file} />
+				{/if}
+			</li>
+		{/each}
+	</ul>
+{/if}
+
+<style>
+	button {
+		padding: 0 0 0 1.5em;
+		background: url(/tutorial/icons/folder.svg) 0 0.1em no-repeat;
+		background-size: 1em 1em;
+		color: var(--fg-1);
+		font-weight: bold;
+		cursor: pointer;
+		border: none;
+		margin: 0;
+	}
+
+	.expanded {
+		background-image: url(/tutorial/icons/folder-open.svg);
+	}
+
+	ul {
+		padding: 0.2em 0 0 0.5em;
+		margin: 0 0 0 0.5em;
+		list-style: none;
+		border-left: 1px solid rgba(128, 128, 128, 0.4);
+	}
+
+	li {
+		padding: 0.2em 0;
+	}
+</style>
+```
+
+##### svelte:component 动态组件
+太常见了，vue 和 react 都可以实现
+```vue
+
+<script>
+	// import Folder from './Folder.svelte';
+	// import { files } from './data.js';
+
+  import RedThing from './RedThing.svelte';
+	import GreenThing from './GreenThing.svelte';
+	import BlueThing from './BlueThing.svelte';
+
+	const options = [
+		{ color: 'red', component: RedThing },
+		{ color: 'green', component: GreenThing },
+		{ color: 'blue', component: BlueThing }
+	];
+
+	let selected = options[0];
+</script>
+
+<!-- 也支持bool值语法，这里是svelte:self -->
+<!-- <Folder name="Home" {files} expanded /> -->
+ 
+
+<!-- 动态组件，元编程 -->
+<select bind:value={selected}>
+	{#each options as option}
+		<option value={option}>{option.color}</option>
+	{/each}
+</select>
+
+<!-- 太常见了 -->
+<svelte:component this={selected.component} />
+```
+
+##### svelte:element 动态dom
+
+```vue
+<script>
+	const options = ['h1', 'h2', 'h3', 'p', 'marquee'];
+	let selected = options[0];
+</script>
+
+<select bind:value={selected}>
+	{#each options as option}
+		<option value={option}>{option}</option>
+	{/each}
+</select>
+
+<svelte:element this={selected}>
+	I'm a <code>&lt;{selected}&gt;</code> element
+</svelte:element>
+
+```
+
+##### svelte:window 全局侦听器
+用在某些领域就非常有意思了。
+```vue
+<script>
+	let key;
+	let keyCode;
+
+	function handleKeydown(event) {
+		key = event.key;
+		keyCode = event.keyCode;
+	}
+</script>
+
+<svelte:window on:keydown={handleKeydown} />
+
+<div style="text-align: center">
+	{#if key}
+		<kbd>{key === ' ' ? 'Space' : key}</kbd>
+		<p>{keyCode}</p>
+	{:else}
+		<p>Focus this window and press any key</p>
+	{/if}
+</div>
+
+<style>
+	div {
+		display: flex;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+	}
+
+	kbd {
+		border-radius: 4px;
+		font-size: 6em;
+		padding: 0.2em 0.5em;
+		background-color: #eeeeee;
+		border-top: 5px solid #f9f9f9;
+		border-left: 5px solid #f9f9f9;
+		border-right: 5px solid #aaaaaa;
+		border-bottom: 5px solid #aaaaaa;
+		color: #555;
+	}
+</style>
+
+```
+`直接绑定全局事件`
+```vue
+
+<script>
+	// import Folder from './Folder.svelte';
+	// import { files } from './data.js';
+
+  // import RedThing from './RedThing.svelte';
+	// import GreenThing from './GreenThing.svelte';
+	// import BlueThing from './BlueThing.svelte';
+
+  // import EventWindow from './EventWindow.svelte';
+
+	// const options = [
+	// 	{ color: 'red', component: RedThing },
+	// 	{ color: 'green', component: GreenThing },
+	// 	{ color: 'blue', component: BlueThing }
+	// ];
+
+	// let selected = options[0];
+
+  // const options = ['h1', 'h2', 'h3', 'p', 'marquee'];
+	// let selected = options[0];
+
+  let y = 0;
+</script>
+
+<!-- 也支持bool值语法，这里是svelte:self -->
+<!-- <Folder name="Home" {files} expanded /> -->
+ 
+
+<!-- 动态组件，元编程 -->
+<!-- <select bind:value={selected}>
+	{#each options as option}
+		<option value={option}>{option.color}</option>
+	{/each}
+</select> -->
+<!-- 太常见了 -->
+<!-- <svelte:component this={selected.component} /> -->
+
+<!-- 动态DOM，不得了，不得了 -->
+<!-- <select bind:value={selected}>
+	{#each options as option}
+		<option value={option}>{option}</option>
+	{/each}
+</select>
+<svelte:element this={selected}>
+	I'm a <code>&lt;{selected}&gt;</code> element
+</svelte:element> -->
+
+<!-- 全局侦听器 -->
+<!-- <EventWindow></EventWindow> -->
+<!-- 直接绑定全局事件也可以 -->
+<svelte:window bind:scrollY={y} />
+<span>depth: {y}px</span>
+<div>
+
+</div>
+
+<style>
+  span {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  div {
+    height: 10000px;
+  }
+</style>
+```
+
+##### svelte:body 类似window绑定
+```vue
+<script>
+	let hereKitty = true;
+</script>
+
+<svelte:body on:mouseenter={() => (hereKitty = false)} on:mouseleave={() => (hereKitty = true)} />
+
+{#if hereKitty}
+  {#each Array(10) as _}
+    	<h1>🐱</h1>
+  {/each}
+
+{/if}
+
+<style>
+	:global(body) {
+		width: 100vw;
+		height: 100vh;
+	}
+</style>
+
+```
+
+##### svelte:document 文档绑定
+
+```vue
+<script>
+	let selection = '';
+
+	const handleSelectionChange = (e) => selection = document.getSelection();
+</script>
+
+<svelte:document on:selectionchange={handleSelectionChange} />
+
+<h1>Select this text to fire events</h1>
+<p>Selection: {selection}</p>
+
+```
+
+##### svelte:head 修改元属性
+```vue
+<script>
+</script>
+
+<svelte:head>
+	<title>你好啊</title>
+</svelte:head>
+
+```
+
+##### svelte:options 组件复用时，独立触发
+
+```vue
+<script>
+	import Todo from './Todo.svelte';
+
+	let todos = [
+		{ id: 1, done: true, text: 'wash the car' },
+		{ id: 2, done: false, text: 'take the dog for a walk' },
+		{ id: 3, done: false, text: 'mow the lawn' }
+	];
+
+	function toggle(toggled) {
+		todos = todos.map((todo) => {
+			if (todo === toggled) {
+				// return a new object
+				return {
+					id: todo.id,
+					text: todo.text,
+					done: !todo.done
+				};
+			}
+
+			// return the same object
+			return todo;
+		});
+	}
+</script>
+
+<div class="centered">
+	<h1>todos</h1>
+
+	<ul class="todos">
+		{#each todos as todo (todo.id)}
+			<Todo {todo} on:change={() => toggle(todo)} />
+		{/each}
+	</ul>
+</div>
+
+<style>
+	.centered {
+		max-width: 20em;
+		margin: 0 auto;
+	}
+</style>
+```
+
+```vue
+<svelte:options immutable />
+<!-- <svelte:options immutable accessors={false} namespace={undefined} customElement={'sss'}/> -->
+<script>
+	import { afterUpdate } from 'svelte';
+	import flash from './flash.js';
+
+	export let todo;
+
+	let element;
+
+	afterUpdate(() => {
+		flash(element);
+	});
+</script>
+
+<!-- the text will flash red whenever
+     the `todo` object changes -->
+<li bind:this={element}>
+	<label>
+		<input type="checkbox" checked={todo.done} on:change />
+		{todo.text}
+	</label>
+</li>
+```
+
+##### svelte:fragment 多根节点合并
+动态插槽内容: 在使用插槽时，有时需要插入多个元素作为一个插槽内容，这时可以使用 `<svelte:fragment>`。
+
+```vue
+<!-- Parent.svelte -->
+<script>
+  import Child from './Child.svelte';
+</script>
+
+<Child>
+  <svelte:fragment slot="content">
+    <p>First paragraph</p>
+    <p>Second paragraph</p>
+  </svelte:fragment>
+</Child>
+
+```
+ 条件渲染多个元素:在条件渲染多个元素时，通常需要一个容器元素，但有时不希望引入额外的 DOM 节点，这时可以使用 `<svelte:fragment>`。
+
+```vue
+<script>
+  let isVisible = true;
+</script>
+
+{#if isVisible}
+  <svelte:fragment>
+    <p>This is the first paragraph</p>
+    <p>This is the second paragraph</p>
+  </svelte:fragment>
+{/if}
+
+```
+
+#### context="module" 组件模块化：相互通讯
+利用模块化脚本，实现共用变量.
+```vue
+<script context="module">
+	// 抽象出去，独立脚本
+	let current;
+</script>
+
+<script>
+	export let src;
+	export let title;
+	export let artist;
+
+	let time = 0;
+	let duration = 0;
+	let paused = true;
+
+	function format(time) {
+		if (isNaN(time)) return '...';
+
+		const minutes = Math.floor(time / 60);
+		const seconds = Math.floor(time % 60);
+
+		return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+	}
+</script>
+
+<div class="player" class:paused>
+	<audio
+		src={src}
+		bind:currentTime={time}
+		bind:duration
+		bind:paused
+		on:play={(e) => {
+			const audio = e.currentTarget;
+
+			if (audio !== current) {
+				current?.pause();
+				current = audio;
+			}
+		}}
+		on:ended={() => {
+			time = 0;
+		}}
+	></audio>
+
+	<button
+		class="play"
+		aria-label={paused ? 'play' : 'pause'}
+		on:click={() => paused = !paused}
+	></button>
+
+	<div class="info">
+		<div class="description">
+			<strong>{title}</strong> /
+			<span>{artist}</span>
+		</div>
+
+		<div class="time">
+			<span>{format(time)}</span>
+			<div
+				class="slider"
+				on:pointerdown={e => {
+					const div = e.currentTarget;
+
+					function seek(e) {
+						const { left, width } = div.getBoundingClientRect();
+
+						let p = (e.clientX - left) / width;
+						if (p < 0) p = 0;
+						if (p > 1) p = 1;
+
+						time = p * duration;
+					}
+
+					seek(e);
+
+					window.addEventListener('pointermove', seek);
+
+					window.addEventListener('pointerup', () => {
+						window.removeEventListener('pointermove', seek);
+					}, {
+						once: true
+					});
+				}}
+			>
+				<div class="progress" style="--progress: {time / duration}%"></div>
+			</div>
+			<span>{duration ? format(duration) : '--:--'}</span>
+		</div>
+	</div>
+</div>
+
+<style>
+	.player {
+		display: grid;
+		grid-template-columns: 2.5em 1fr;
+		align-items: center;
+		gap: 1em;
+		padding: 0.5em 1em 0.5em 0.5em;
+		border-radius: 2em;
+		background: var(--bg-1);
+		transition: filter 0.2s;
+		color: var(--fg-3);
+		user-select: none;
+	}
+
+	.player:not(.paused) {
+		color: var(--fg-1);
+		filter: drop-shadow(0.5em 0.5em 1em rgba(0,0,0,0.1));
+	}
+
+	button {
+		width: 100%;
+		aspect-ratio: 1;
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		border-radius: 50%;
+	}
+
+	[aria-label="pause"] {
+		background-image: url(./pause.svg);
+	}
+
+	[aria-label="play"] {
+		background-image: url(./play.svg);
+	}
+
+	.info {
+		overflow: hidden;
+	}
+
+	.description {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.2;
+	}
+
+	.time {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.time span {
+		font-size: 0.7em;
+	}
+
+	.slider {
+		flex: 1;
+		height: 0.5em;
+		background: var(--bg-2);
+		border-radius: 0.5em;
+		overflow: hidden;
+	}
+
+	.progress {
+		width: calc(100 * var(--progress));
+		height: 100%;
+		background: var(--bg-3);
+	}
+</style>
+```
+##### 组件逻辑导出
+只要你想暴露组件中的逻辑。就必须用export。
+
+```vue
+<script context="module">
+	let current;
+
+	export function stopAll() {
+		current?.pause();
+	}
+</script>
+```
+在其他组件直接引用
+```vue
+<script>
+	import AudioPlayer, { stopAll } from './AudioPlayer.svelte';
+	import { tracks } from './tracks.js';
+</script>
+```
+```vue
+<div class="centered">
+	{#each tracks as track}
+		<AudioPlayer {...track} />
+	{/each}
+
+	<button on:click={stopAll}>
+		stop all
+	</button>
+</div>
+
+```
+
+#### debug专用
+
+一种方法是 `console.log(...)` 在标记中使用。但是，如果要暂停执行，则可以将 `{@debug ...}` 标记与要检查的逗号分隔值列表一起使用：
+
+```vue
+<script>
+	let user = {
+		firstname: 'Ada',
+		lastname: 'Lovelace'
+	};
+</script>
+
+<label>
+	<input bind:value={user.firstname} />
+	first name
+</label>
+
+<label>
+	<input bind:value={user.lastname} />
+	last name
+</label>
+
+{@debug user}
+
+<h1>Hello {user.firstname}!</h1>
+
+```
+![](Pasted%20image%2020240612131845.png)
 
 ### kit全栈框架使用
+
+后续待定。
