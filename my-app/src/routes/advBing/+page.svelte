@@ -20,19 +20,18 @@
 </script>
 
 <!-- html绑定 -->
-<!-- <AdvancedBindings></AdvancedBindings> -->
+<AdvancedBindings></AdvancedBindings>
 <!-- 循环绑定 -->
-<!-- <AdvancedEach></AdvancedEach> -->
+<AdvancedEach></AdvancedEach>
 <!-- 这个牛逼，媒体绑定 -->
-<!-- <AdvancedMdia></AdvancedMdia> -->
+<AdvancedMdia></AdvancedMdia>
 <!-- 测量包装元素 -->
-<!-- <AdvancedDim></AdvancedDim> -->
+<AdvancedDim></AdvancedDim>
 <!-- 组件传参绑定 -->
-
 <h1 style="opacity: {pin ? 1 : 0.4}">
 	{view}
 </h1>
-<!-- 非常不推荐这么做，使用on:submit 则必须要$props -->
+<!-- 非常不推荐这么做，不使用on:submit，使用$props -->
 <Keypad bind:value={pin} on:submit={handleSubmit} />
 
 

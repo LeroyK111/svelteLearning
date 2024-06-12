@@ -1,23 +1,25 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
+	import { createEventDispatcher } from 'svelte';
 
 	export let value = '';
-	
 
 	$: {
 		// 双向数据绑定
 		console.log('value值被改变了:', value);
 	}
 
-
-	// 选择 
+	// 选择
 	const select = (num) => () => (value += num);
 	// 清空
 	const clear = () => (value = '');
 
-	// 这个只有在特殊情况下推荐这么使用
+	// 完全不推荐这么用啊
 	const dispatch = createEventDispatcher();
 	const submit = () => dispatch('submit');
+
+	// 
+
+
 </script>
 
 <div class="keypad">

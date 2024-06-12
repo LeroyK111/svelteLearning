@@ -1219,6 +1219,7 @@ export const count = writable(0);
 
 ```
 
+<<<<<<< HEAD
 ##### Actions 
 操作的本质起始就是对dom和api进行处理。
 - 与第三方库对接
@@ -1232,6 +1233,13 @@ export const count = writable(0);
 `svelteLearning\my-app\src\routes\actions\+page.svelte`
 ```vue
 <script context="module">
+=======
+#### Actions 
+自定义事件。
+##### use的用法
+```vue
+<script context="module" lang="ts">
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 	/**
 	 * @author Leroy
 	 * 同一个模块中使用多个script标签
@@ -1264,13 +1272,24 @@ export const count = writable(0);
 
 	// js分块
 	test();
+<<<<<<< HEAD
+=======
+
+	// 获取 canvas 组件级别的对象，然后调用暴露的方法 
+	let canvas: any;
+
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 </script>
 
 
 
 <div class="container">
 	<!-- 画布大小 -->
+<<<<<<< HEAD
 	<Canvas color={selected} {size} />
+=======
+	<Canvas bind:this={canvas} color={selected} {size} />
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 
 	<!-- 菜单dom -->
 	{#if showMenu}
@@ -1313,6 +1332,12 @@ export const count = writable(0);
 		<button class="show-menu" on:click={() => (showMenu = !showMenu)}>
 			{showMenu ? 'close' : 'menu'}
 		</button>
+<<<<<<< HEAD
+=======
+		<button class="show-menu" on:click={() => canvas.clear()}>
+			clear
+		</button>
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 	</div>
 </div>
 
@@ -1397,8 +1422,13 @@ export const count = writable(0);
 </style>
 
 ```
+<<<<<<< HEAD
 `svelteLearning\my-app\src\routes\actions\Canvas.svelte`
 ```vue
+=======
+```vue
+
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { test } from './+page.svelte';
@@ -1426,6 +1456,14 @@ export const count = writable(0);
 		return { x, y };
 	}
 
+<<<<<<< HEAD
+=======
+	export function clear() {
+		// 清除画布
+		context.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 	onMount(() => {
 		// 获取dom的2d对象
 		context = canvas.getContext('2d');
@@ -1530,7 +1568,10 @@ export const count = writable(0);
 </style>
 
 ```
+<<<<<<< HEAD
 `actions.ts`
+=======
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 ```ts
 /**
  * @author Leroy
@@ -1603,7 +1644,15 @@ export function trapFocus(node: HTMLDivElement) {
 }
 
 ```
+<<<<<<< HEAD
 ###### update 避免异步
+=======
+
+
+##### update的副作用用法
+update 回调：当 action 的参数发生变化时，Svelte 会调用 update 回调。你可以在这里更新工具提示的属性。
+destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于清理工具提示。
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 ```vue
 <script lang="ts">
 	import tippy, { type MultipleTargets, type Props } from 'tippy.js';
@@ -1633,10 +1682,411 @@ export function trapFocus(node: HTMLDivElement) {
 <input bind:value={content} />
 
 <button use:tooltip={{ content, theme: 'material' }}> Hover me </button>
+<<<<<<< HEAD
 
 ```
 
 ##### 进阶绑定
+=======
+```
+
+#### 高级绑定
+`svelteLearning/my-app/src/routes/advBing/+page.svelte`
+##### dom对象绑定
+```vue
+<script>
+	let html = '<p>Write some text!</p>';
+</script>
+
+<!-- 直接绑定dom，取出字符串 -->
+<div bind:innerHTML={html} contenteditable></div>
+
+<pre>{html}</pre>
+
+<style>
+  /* 索引 */
+	[contenteditable] {
+		padding: 0.5em;
+		border: 1px solid #eee;
+		border-radius: 4px;
+	}
+</style>
+```
+##### #each绑定
+```vue
+<script>
+	let todos = [
+		{ done: false, text: 'finish Svelte tutorial' },
+		{ done: false, text: 'build an app' },
+		{ done: false, text: 'world domination' }
+	];
+
+	function add() {
+    // 加入新参数
+		todos = todos.concat({
+			done: false,
+			text: ''
+		});
+	}
+
+	function clear() {
+    // 过滤被选中的
+		todos = todos.filter((t) => !t.done);
+	}
+
+  // 计算器
+	$: remaining = todos.filter((t) => !t.done).length;
+</script>
+
+<div class="centered">
+	<h1>todos</h1>
+
+	<ul class="todos">
+		{#each todos as todo}
+			<li class:done={todo.done}>
+        <!-- 直接绑定两个事件 -->
+				<input type="checkbox" bind:checked={todo.done} />
+				<input type="text" placeholder="What needs to be done?" bind:value={todo.text} />
+			</li>
+		{/each}
+	</ul>
+
+	<p>{remaining} remaining</p>
+
+	<button on:click={add}> Add new </button>
+
+	<button on:click={clear}> Clear completed </button>
+</div>
+
+<style>
+	.centered {
+		max-width: 20em;
+		margin: 0 auto;
+	}
+
+	.done {
+		opacity: 0.4;
+	}
+
+	li {
+		display: flex;
+	}
+
+	input[type='text'] {
+		flex: 1;
+		padding: 0.5em;
+		margin: -0.2em 0;
+		border: none;
+	}
+</style>
+```
+##### media 媒体绑定
+```vue
+<script>
+	import AudioPlayer from './AudioPlayer.svelte';
+	export const tracks = [
+		{
+			// https://musopen.org/music/9862-the-blue-danube-op-314/
+			src: 'https://learn.svelte.dev/assets/media/music/strauss.mp3',
+			title: 'The Blue Danube Waltz',
+			artist: 'Johann Strauss'
+		},
+
+		{
+			// https://musopen.org/music/43775-the-planets-op-32/
+			src: 'https://learn.svelte.dev/assets/media/music/holst.mp3',
+			title: 'Mars, the Bringer of War',
+			artist: 'Gustav Holst'
+		},
+
+		{
+			// https://musopen.org/music/8010-3-gymnopedies/
+			src: 'https://learn.svelte.dev/assets/media/music/satie.mp3',
+			title: 'Gymnopédie no. 1',
+			artist: 'Erik Satie'
+		},
+
+		{
+			// https://musopen.org/music/43683-requiem-in-d-minor-k-626/
+			src: 'https://learn.svelte.dev/assets/media/music/mozart.mp3',
+			title: 'Requiem in D minor, K. 626 - III. Sequence - Lacrymosa',
+			artist: 'Wolfgang Amadeus Mozart'
+		}
+	];
+
+
+</script>
+
+<div class="centered">
+	{#each tracks as track}
+		<AudioPlayer {...track} />
+	{/each}
+</div>
+
+<style>
+	.centered {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		justify-content: center;
+		gap: 0.5em;
+		max-width: 40em;
+		margin: 0 auto;
+	}
+</style>
+```
+##### 元素事件直接绑定
+```vue
+<script lang="ts">
+	let w: number;
+	let h: number;
+	let size = 42;
+	let text = 'edit this text';
+</script>
+
+<label>
+	<input type="range" bind:value={size} min="10" max="100" />
+	font size ({size}px)
+</label>
+
+<!-- 自己获取dom元素大小，然后修改w和h的值 -->
+<div bind:clientWidth={w} bind:clientHeight={h}>
+	<span style="font-size: {size}px" contenteditable>{text}</span>
+	<span class="size">{w} x {h} px</span>
+</div>
+
+<style>
+	div {
+		position: relative;
+		display: inline-block;
+		padding: 0.5rem;
+		background: hsla(15, 100%, 50%, 0.1);
+		border: 1px solid hsl(15, 100%, 50%);
+	}
+
+	.size {
+		position: absolute;
+		right: -1px;
+		bottom: -1.4em;
+		line-height: 1;
+		background: hsl(15, 100%, 50%);
+		color: white;
+		padding: 0.2em 0.5em;
+		white-space: pre;
+	}
+</style>
+```
+##### 组件传参绑定
+
+数据的双向绑定+事件的双向绑定
+
+```vue
+<script lang="ts">
+	import AdvancedBindings from '../../components/AdvancedBindings.svelte';
+	import AdvancedEach from '../../components/AdvancedEach.svelte';
+	import AdvancedMdia from '../../components/AdvancedMdia.svelte';
+	import AdvancedDim from '../../components/AdvancedDim.svelte';
+  import Keypad from './Keypad.svelte';
+
+
+	let pin: any;
+	$: view = pin ? pin.replace(/\d(?!$)/g, '•') : 'enter your pin';
+
+  $: {
+		console.log("pin值被改变了:", pin);
+	}
+
+	function handleSubmit() {
+		alert(`submitted ${pin}`);
+    
+	}
+</script>
+
+<!-- html绑定 -->
+<AdvancedBindings></AdvancedBindings>
+<!-- 循环绑定 -->
+<AdvancedEach></AdvancedEach>
+<!-- 这个牛逼，媒体绑定 -->
+<AdvancedMdia></AdvancedMdia>
+<!-- 测量包装元素 -->
+<AdvancedDim></AdvancedDim>
+<!-- 组件传参绑定 -->
+<h1 style="opacity: {pin ? 1 : 0.4}">
+	{view}
+</h1>
+<!-- 非常不推荐这么做，不使用on:submit，使用$props -->
+<Keypad bind:value={pin} on:submit={handleSubmit} />
+
+```
+
+#### css样式
+
+##### 简写写法
+```vue
+<script>
+	let flipped = false;
+</script>
+
+<div class="container">
+	Flip the card
+	<!-- 		class:flipped={flipped} 此指令的意思是“只要 flipped 真实，就添加 flipped 类”。 -->
+	<!-- 同名简写方式  -->
+	<button class="card" class:flipped on:click={() => (flipped = !flipped)}>
+		<div class="front">
+			<span class="symbol">♠</span>
+		</div>
+		<div class="back">
+			<div class="pattern"></div>
+		</div>
+	</button>
+</div>
+
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		perspective: 100vh;
+	}
+
+	.card {
+		position: relative;
+		aspect-ratio: 2.5 / 3.5;
+		font-size: min(1vh, 0.25rem);
+		height: 80em;
+		background: var(--bg-1);
+		border-radius: 2em;
+		transform: rotateY(180deg);
+		transition: transform 0.4s;
+		transform-style: preserve-3d;
+		padding: 0;
+		user-select: none;
+		cursor: pointer;
+	}
+
+	.card.flipped {
+		transform: rotateY(0);
+	}
+
+	.front,
+	.back {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		backface-visibility: hidden;
+		border-radius: 2em;
+		border: 1px solid var(--fg-2);
+		box-sizing: border-box;
+		padding: 2em;
+	}
+
+	.front {
+		background:
+			url(../../assets/svelte-logo.svg) no-repeat 5em 5em,
+			url(../../assets/svelte-logo.svg) no-repeat calc(100% - 5em) calc(100% - 5em);
+		background-size:
+			8em 8em,
+			8em 8em;
+	}
+
+	.back {
+		transform: rotateY(180deg);
+	}
+
+	.symbol {
+		font-size: 30em;
+		color: var(--fg-1);
+	}
+
+	.pattern {
+		width: 100%;
+		height: 100%;
+		background-color: var(--bg-2);
+		/* pattern from https://projects.verou.me/css3patterns/#marrakesh */
+		background-image: radial-gradient(var(--bg-3) 0.9em, transparent 1em),
+			repeating-radial-gradient(
+				var(--bg-3) 0,
+				var(--bg-3) 0.4em,
+				transparent 0.5em,
+				transparent 2em,
+				var(--bg-3) 2.1em,
+				var(--bg-3) 2.5em,
+				transparent 2.6em,
+				transparent 5em
+			);
+		background-size:
+			3em 3em,
+			9em 9em;
+		background-position: 0 0;
+		border-radius: 1em;
+	}
+</style>
+```
+
+##### 混合写法
+```vue
+
+<!-- 写法一 -->
+<button
+	class="card"
+	style="transform: {flipped ? 'rotateY(0)' : ''}; --bg-1: palegoldenrod; --bg-2: black; --bg-3: goldenrod"
+	on:click={() => flipped = !flipped}
+>
+
+<!-- 写法二 -->
+<button
+	class="card"
+	style:transform={flipped ? 'rotateY(0)' : ''}
+	style:--bg-1="palegoldenrod"
+	style:--bg-2="black"
+	style:--bg-3="goldenrod"
+	on:click={() => flipped = !flipped}
+>
+
+<!-- 支持style 和 class 混合写法 -->
+
+```
+
+##### 穿透写法
+```vue
+<script>
+	import Son from './Son.svelte';
+</script>
+
+<!-- 支持style 穿透 -->
+<div class="boxes">
+	<Son --color="red" />
+	<Son --color="green" />
+	<Son --color="blue" />
+</div>
+
+```
+
+```vue
+<div class="box"></div>
+
+<style>
+	.box {
+		width: 5em;
+		height: 5em;
+		border-radius: 0.5em;
+		margin: 0 0 1em 0;
+		background-color: var(--color, #ddd);
+	}
+</style>
+```
+
+
+#### 插槽slot
+>>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 
 
 

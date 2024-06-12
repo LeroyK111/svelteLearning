@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
 	/**
 	 * @author Leroy
 	 * 同一个模块中使用多个script标签
@@ -31,13 +31,17 @@
 
 	// js分块
 	test();
+
+	// 获取 canvas 组件级别的对象，然后调用暴露的方法 
+	let canvas: any;
+
 </script>
 
 
 
 <div class="container">
 	<!-- 画布大小 -->
-	<Canvas color={selected} {size} />
+	<Canvas bind:this={canvas} color={selected} {size} />
 
 	<!-- 菜单dom -->
 	{#if showMenu}
@@ -79,6 +83,9 @@
 	<div class="controls">
 		<button class="show-menu" on:click={() => (showMenu = !showMenu)}>
 			{showMenu ? 'close' : 'menu'}
+		</button>
+		<button class="show-menu" on:click={() => canvas.clear()}>
+			clear
 		</button>
 	</div>
 </div>
