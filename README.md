@@ -111,6 +111,40 @@ step:
 
 ### 组件编辑
 
+#### 多标签语法
+##### script 标签
+```vue
+<script lang="ts" context="module">
+	// 模块
+	console.log('抽象模块');
+	const test = () => {
+		console.log('测试子script');
+	};
+  export { test }
+</script>
+
+<script lang="ts">
+  /**
+   * 同一文件 svelte 下：模块也会被执行，并且也可以被其他script中函数调用。
+   * 不同svelte下，跨文件调用script模块中函数，则需要export 暴露
+  */
+	test();
+</script>
+```
+##### style 标签
+```vue
+
+<style lang="scss">
+  /* style 只支持一个style标签，默认定义域就是当前文件。除非你加:global */
+</style>
+```
+##### template 模板标签
+```vue
+<template lang="pu">
+  <!-- 支持pub等模块语法，但vite下不支持。去除vite即刻生效 -->
+</template>
+```
+
 #### 组件响应式+page.svelte
 ```html
 <script lang="ts">
@@ -754,6 +788,9 @@ import { marked } from 'marked';
 <div></div>
 ```
 ##### tick dom更新的颗粒
+
+这里通过 bind:this={inputElement} 我们也可以获取到原生dom对象。
+
 ```vue
 <script lang="ts">
 	import { tick } from 'svelte';
@@ -1183,9 +1220,423 @@ export const count = writable(0);
 ```
 
 ##### Actions 
-我
+操作的本质起始就是对dom和api进行处理。
+- 与第三方库对接
+- 延迟加载的图像
+- 工具提示
+- 添加自定义事件处理程序
+###### use用法
+
+在 Svelte 中，`use:` 指令用于将一个动作（action）应用到一个元素上。动作是一种用于封装与 DOM 元素交互逻辑的机制，可以在元素被创建时执行某些操作，并在元素被移除时进行清理。它们通常用于处理需要直接操作 DOM 的场景，例如设置焦点、创建图表、注册事件等。
+
+`svelteLearning\my-app\src\routes\actions\+page.svelte`
+```vue
+<script context="module">
+	/**
+	 * @author Leroy
+	 * 同一个模块中使用多个script标签
+	 */
+	console.log(111);
+	const test = (msg: number | string = 222) => {
+		console.log(msg);
+	};
+
+	// 如果其他svelte想要调用则需要单独暴露
+	export { test };
+</script>
+
+<script lang="ts">
+	/**
+	 * @author Leroy
+	 * 使用canvas画布，构建图层
+	 */
+	import Canvas from './Canvas.svelte';
+	import { trapFocus } from './actions';
+
+	// 画笔颜色种类
+	const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'white', 'black'];
+	// 默认选中red
+	let selected = colors[0];
+	// 画笔粗细
+	let size = 10;
+	// 菜单展示
+	let showMenu = true;
+
+	// js分块
+	test();
+</script>
 
 
+
+<div class="container">
+	<!-- 画布大小 -->
+	<Canvas color={selected} {size} />
+
+	<!-- 菜单dom -->
+	{#if showMenu}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- 遮罩层, 事件绑定的定义域 -->
+		<div
+			class="modal-background"
+			on:click|self={() => (showMenu = false)}
+			on:keydown={(e) => {
+				if (e.key === 'Escape') showMenu = false;
+			}}
+		>
+			<!-- 在 Svelte 中，use: 指令用于将一个动作（action）应用到一个元素上。动作是一种用于封装与 DOM 元素交互逻辑的机制，可以在元素被创建时执行某些操作，并在元素被移除时进行清理。它们通常用于处理需要直接操作 DOM 的场景，例如设置焦点、创建图表、注册事件等。 -->
+			<div class="menu" use:trapFocus>
+				<div class="colors">
+					{#each colors as color}
+						<button
+							class="color"
+							aria-label={color}
+							aria-current={selected === color}
+							style="--color: {color}"
+							on:click={() => {
+								selected = color;
+							}}
+						></button>
+					{/each}
+				</div>
+
+				<label>
+					small
+					<input type="range" bind:value={size} min="1" max="50" />
+					large
+				</label>
+			</div>
+		</div>
+	{/if}
+
+	<!-- 菜单按钮 -->
+	<div class="controls">
+		<button class="show-menu" on:click={() => (showMenu = !showMenu)}>
+			{showMenu ? 'close' : 'menu'}
+		</button>
+	</div>
+</div>
+
+<style lang="scss">
+	.container {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		.controls {
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: 1em;
+		}
+	}
+
+	.show-menu {
+		width: 5em;
+		height: 3em;
+		background-color: skyblue;
+		border: none;
+		color: #fff;
+		font-weight: bold;
+	}
+
+	.modal-background {
+		position: fixed;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		backdrop-filter: blur(20px);
+	}
+
+	.menu {
+		position: relative;
+		background: var(--bg-2);
+		width: calc(100% - 2em);
+		max-width: 28em;
+		padding: 1em 1em 0.5em 1em;
+		border-radius: 1em;
+		box-sizing: border-box;
+		user-select: none;
+	}
+
+	.colors {
+		display: grid;
+		align-items: center;
+		grid-template-columns: repeat(9, 1fr);
+		grid-gap: 0.5em;
+	}
+
+	.color {
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: var(--color, #fff);
+		transform: none;
+		filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.2));
+		transition: all 0.1s;
+	}
+
+	.color[aria-current='true'] {
+		transform: translate(1px, 1px);
+		filter: none;
+		box-shadow: inset 3px 3px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.menu label {
+		display: flex;
+		width: 100%;
+		margin: 1em 0 0 0;
+	}
+
+	.menu input {
+		flex: 1;
+	}
+</style>
+
+```
+`svelteLearning\my-app\src\routes\actions\Canvas.svelte`
+```vue
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { test } from './+page.svelte';
+
+	test('外来模块用法');
+
+	// 接受参数
+	export let color;
+	export let size;
+
+	let canvas: HTMLCanvasElement;
+	let context: any;
+	let previous: any;
+
+	function get_coords(e) {
+		// 获取鼠标的绝对坐标
+		const { clientX, clientY } = e;
+		// console.log('鼠标绝对坐标系', Math.trunc(clientX), Math.trunc(clientY));
+
+		// 画板的绝对坐标
+		const { left, top } = canvas.getBoundingClientRect();
+		// 求出鼠标在画板上的相对坐标系
+		const x = clientX - left;
+		const y = clientY - top;
+		return { x, y };
+	}
+
+	onMount(() => {
+		// 获取dom的2d对象
+		context = canvas.getContext('2d');
+		function resize() {
+			// 直接设置canvas大小为整个视口界面
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+		}
+
+		// 监听视口变换，canvas直接跟随变换
+		window.addEventListener('resize', resize);
+		resize();
+
+		return () => {
+			window.removeEventListener('resize', resize);
+		};
+	});
+</script>
+
+<canvas
+	bind:this={canvas}
+	on:pointerdown={(e) => {
+		console.log('鼠标点击');
+
+		// 鼠标点下事件
+		const coords = get_coords(e);
+		// 填充颜色
+		context.fillStyle = color;
+		// 开始绘制
+		context.beginPath();
+		// 绘制圆心
+		context.arc(coords.x, coords.y, size / 2, 0, 2 * Math.PI);
+		// 填充
+		context.fill();
+
+		// 记录一下颜色
+		previous = coords;
+	}}
+	on:pointerleave={() => {
+		// 鼠标离开
+		previous = null;
+		console.log('鼠标离开');
+	}}
+	on:pointermove={(e) => {
+		// 鼠标移动事件
+		const coords = get_coords(e);
+		console.log(e.buttons);
+
+		if (e.buttons === 1) {
+			// 移动并且 鼠标左键点下
+			// 阻止事件传递
+			e.preventDefault();
+			// 画笔开始作画
+			// 绘制线条颜色
+			context.strokeStyle = color;
+			// 线条粗细
+			context.lineWidth = size;
+			// 线条末端为圆形
+			context.lineCap = 'round';
+			// 开始一条新路径
+			context.beginPath();
+			// 将绘制的起点移动到坐标
+			context.moveTo(previous.x, previous.y);
+			// 从当前点绘制一条直线到坐标
+			context.lineTo(coords.x, coords.y);
+			// 根据当前的描边样式绘制路径
+			context.stroke();
+		}
+		previous = coords;
+	}}
+></canvas>
+
+<!-- 鼠标指引表示 -->
+{#if previous}
+	<div
+		class="preview"
+		style="--color: {color}; --size: {size}px; --x: {previous.x}px; --y: {previous.y}px"
+	></div>
+{/if}
+
+<style>
+	canvas {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.preview {
+		position: absolute;
+		left: var(--x);
+		top: var(--y);
+		width: var(--size);
+		height: var(--size);
+		transform: translate(-50%, -50%);
+		background: var(--color);
+		border-radius: 50%;
+		opacity: 0.5;
+		pointer-events: none;
+	}
+</style>
+
+```
+`actions.ts`
+```ts
+/**
+ * @author Leroy
+ * 借助use：绑定到dom上
+ */
+
+export function trapFocus(node: HTMLDivElement) {
+	// 是一个只读属性，它返回当前文档中获得焦点的元素
+	const previous = document.activeElement as HTMLElement;
+
+	console.log('use: 绑定的dom节点', node);
+
+	function focusable(): [HTMLElement] {
+		/**
+		 * 这个函数 focusable 用于获取指定节点（node）中所有可以获得焦点的元素，并返回它们的数组。
+		 *
+		 *
+		 */
+		return Array.from(
+			// 炸掉所有符合button标签, href属性等内容的dom元素
+			node.querySelectorAll(
+				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+			)
+		);
+	}
+
+	function handleKeydown(event: { key: string; shiftKey: any; preventDefault: () => void }) {
+		/**
+		 * 按下tab后的选择
+		 *
+		 */
+
+		if (event.key !== 'Tab') return;
+		// 当前被选中的dom元素
+		const current = document.activeElement;
+		// 获取菜单中的所有元素
+		const elements = focusable();
+		console.log(elements);
+		// 获取首尾两个元素
+		const first = elements.at(0) as HTMLElement;
+		const last = elements.at(-1) as HTMLElement;
+
+		console.log(event.shiftKey);
+		
+		// 让 tab 的聚焦循环起来
+		if (event.shiftKey && current === first) {
+			last.focus();
+			event.preventDefault();
+		}
+
+		if (!event.shiftKey && current === last) {
+			first.focus();
+			event.preventDefault();
+		}
+	}
+
+	// 默认聚焦第一个选型
+	focusable()[0]?.focus();
+
+	// 给整个菜单node绑定一个键盘事件
+	node.addEventListener('keydown', handleKeydown);
+
+	return {
+		// 事件销毁
+		destroy() {
+			node.removeEventListener('keydown', handleKeydown);
+			previous.focus();
+		}
+	};
+}
+
+```
+###### update 避免异步
+```vue
+<script lang="ts">
+	import tippy, { type MultipleTargets, type Props } from 'tippy.js';
+	import 'tippy.js/dist/tippy.css';
+	import 'tippy.js/themes/material.css';
+
+	let content = 'Hello!';
+
+	function tooltip(node: MultipleTargets | HTMLButtonElement, options: Partial<Props> | undefined) {
+    console.log('传递的参数', options);
+
+    // 浮动事件
+		const tooltip = tippy(node, options);
+
+		return {
+      // update 回调
+			update(options: any) {
+				tooltip.setProps(options);
+			},
+			destroy() {
+				tooltip.destroy();
+			}
+		};
+	}
+</script>
+
+<input bind:value={content} />
+
+<button use:tooltip={{ content, theme: 'material' }}> Hover me </button>
+
+```
+
+##### 进阶绑定
 
 
 
