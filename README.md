@@ -3286,4 +3286,91 @@ export const colors = data.map(({ hex, name }) => {
 
 ### kit全栈框架使用
 
-后续待定。
+直接使用 sveltekit 脚手架创建应用：
+```
+npm create svelte@latest my-app
+```
+
+#### 文件式路由
+```
+├── app.d.ts 声明文件
+├── app.html 根模版文件
+├── routes 路由文件夹
+│   ├── +error.svelte 404异常捕获文件夹
+│   ├── +page.svelte / 根路由
+│   ├── actions /actions 路由文件夹
+│   │   ├── +page.svelte 该路由下的主页
+│   │   ├── Canvas.svelte
+│   │   └── actions.ts
+│   ├── advBing
+│   │   ├── +page.svelte
+│   │   └── Keypad.svelte
+│   ├── advanced
+│   │   ├── +page.svelte
+...
+```
+
+我们可以通过a标签实现路由跳转。
+`svelteLearning/my-app/src/routes/testrouter1/+page.svelte`
+```vue
+<a href="/testrouter2" target="_blank" >跳转到2路由</a>
+```
+`svelteLearning/my-app/src/routes/testrouter2/+page.svelte`
+```vue
+<a href="/testrouter1" target="_self">跳转到1路由</a>
+```
+
+#### layout 布局文件
+在不同的路由层级，布局的效果会以插槽的形式呈现。
+
+`svelteLearning/my-app/src/routes/+layout.svelte`
+```vue
+<nav>
+<a href="/testrouter1" target="_self">跳转到1路由</a>
+<a href="/testrouter2" target="_self">跳转到2路由</a>
+</nav>
+
+<slot></slot>
+```
+
+
+#### 动态路由
+`svelteLearning/my-app/src/routes/blog/[slug]/+page.svelte`
+```vue
+<script>
+  /**
+   * @author Leroy
+   * 动态路由传递，通过【文件夹】的形式
+   * 一个网址区段中可以显示多个路由参数，只要它们至少由一个静态字符分隔即可： foo/[bar]x[baz] 是有效的路由，其中 [bar] 和 [baz] 是动态参数。
+  */
+
+
+</script>
+
+<h1>动态路由</h1>
+```
+
+#### 前后端一体写法
+
+必须统一命名文件，不然load函数无法加载到对应的 svelte 组件中去，无法传递$props
+
+- **数据流动**:
+    - `+page.server.js` 中的 `load` 函数获取数据，并返回一个对象。
+    - 返回的对象中的数据会被传递到 `+page.svelte` 文件中，作为其 `props`（属性）之一。
+- **生命周期**:
+    - `+page.server.js` 中的 `load` 函数在服务器端运行，每次页面请求时都会执行。
+    - `+page.svelte` 文件中的代码在客户端运行，用于渲染和显示数据。
+- **示例工作流程**:
+    - 用户请求页面 `/example/1`。
+    - SvelteKit 触发 `+page.server.js` 中的 `load` 函数，使用 `params.id` 获取对应的数据。
+    - 数据加载完成后，传递给 `+page.svelte` 文件。
+    - `+page.svelte` 文件使用传递的数据来渲染页面内容。
+```
+src/
+  routes/
+    example/
+      [id]/
+        +page.svelte。  客户端ui
+        +page.server.js 服务端脚本
+```
+

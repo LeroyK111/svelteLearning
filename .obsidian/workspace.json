@@ -1,0 +1,199 @@
+{
+  "main": {
+    "id": "ab445a51f264da23",
+    "type": "split",
+    "children": [
+      {
+        "id": "f1a962799b2e784f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4924a190cb3b1348",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "7dd00ea52c8fda22",
+    "type": "split",
+    "children": [
+      {
+        "id": "e0fe87ddc6e25a5f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "145ea8245cee82b2",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "b13852fdc97d9f15",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "1345047cbbc70d2e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "e2bf5ed091ec3583",
+    "type": "split",
+    "children": [
+      {
+        "id": "d414a50ae4669e13",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9613f1a18f73c9df",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "README.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f405a9c21d47455c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "README.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "6d611425dc114a23",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "fc93bde35f4b3fdd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "README.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "4924a190cb3b1348",
+  "lastOpenFiles": [
+    "my-app/src/routes/blog/+page.server.ts",
+    "my-app/src/routes/blog/page1.server.ts",
+    "my-app/src/routes/blog/[slug]/+page.server.ts",
+    "my-app/vite.config.ts.timestamp-1718208200608-239549f26afaa.mjs",
+    "my-app/vite.config.ts.timestamp-1718207936644-39ab7310c8ee6.mjs",
+    "my-app/vite.config.ts.timestamp-1718207916274-7baeef917fde1.mjs",
+    "my-app/src/routes/blog/data.ts",
+    "my-app/src/routes/blog/+page.svelte",
+    "my-app/src/routes/blog/+page.svelte.ts",
+    "my-app/src/routes/blog/[slug]/+page.svelte.ts",
+    "my-app/src/routes/blog/[slug]/+layout.svelte",
+    "readme.assets/Pasted image 20240612131845.png",
+    "my-app/static/mylog.png",
+    "my-app/src/assets/svelte-logo.svg",
+    "my-app/node_modules/marked/man/marked.1.md",
+    "my-app/node_modules/marked/README.md",
+    "my-app/node_modules/marked/LICENSE.md",
+    "my-app/node_modules/mdsvex/README.md",
+    "my-app/node_modules/pug-linker/README.md",
+    "my-app/node_modules/pug-linker/HISTORY.md",
+    "my-app/node_modules/css-tree/README.md",
+    "my-app/node_modules/tippy.js/README.md",
+    "my-app/node_modules/babel-walk/README.md",
+    "my-app/node_modules/babel-walk/LICENSE.md",
+    "my-app/node_modules/@eslint/config-array/README.md",
+    "my-app/node_modules/es-define-property/README.md",
+    "my-app/node_modules/es-define-property/CHANGELOG.md",
+    "my-app/node_modules/@babel/helper-validator-identifier/README.md",
+    "my-app/node_modules/code-red/README.md",
+    "my-app/node_modules/with/README.md",
+    "my-app/node_modules/@babel/parser/README.md",
+    "my-app/node_modules/@babel/helper-string-parser/README.md",
+    "my-app/node_modules/@babel/parser/CHANGELOG.md",
+    "my-app/node_modules/call-bind/README.md",
+    "my-app/node_modules/call-bind/CHANGELOG.md",
+    "my-app/node_modules/mdn-data/README.md",
+    "my-app/node_modules/mdn-data/css/readme.md",
+    "my-app/node_modules/mdn-data/CHANGELOG.md",
+    "my-app/node_modules/asap/LICENSE.md",
+    "my-app/src/assets/sound-on.svg",
+    "my-app/src/assets/sound-off.svg",
+    "my-app/src/assets/play.svg",
+    "my-app/src/assets/pause.svg",
+    "my-app/src/assets/svelte-logo-mask.svg",
+    "my-app/node_modules/playwright-core/lib/vite/traceViewer/playwright-logo.svg",
+    "my-app/node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg"
+  ]
+}
