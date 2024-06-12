@@ -1219,7 +1219,7 @@ export const count = writable(0);
 
 ```
 
-<<<<<<< HEAD
+
 ##### Actions 
 操作的本质起始就是对dom和api进行处理。
 - 与第三方库对接
@@ -1232,14 +1232,7 @@ export const count = writable(0);
 
 `svelteLearning\my-app\src\routes\actions\+page.svelte`
 ```vue
-<script context="module">
-=======
-#### Actions 
-自定义事件。
-##### use的用法
-```vue
 <script context="module" lang="ts">
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 	/**
 	 * @author Leroy
 	 * 同一个模块中使用多个script标签
@@ -1272,24 +1265,17 @@ export const count = writable(0);
 
 	// js分块
 	test();
-<<<<<<< HEAD
-=======
 
 	// 获取 canvas 组件级别的对象，然后调用暴露的方法 
 	let canvas: any;
 
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 </script>
 
 
 
 <div class="container">
 	<!-- 画布大小 -->
-<<<<<<< HEAD
-	<Canvas color={selected} {size} />
-=======
 	<Canvas bind:this={canvas} color={selected} {size} />
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 
 	<!-- 菜单dom -->
 	{#if showMenu}
@@ -1332,12 +1318,7 @@ export const count = writable(0);
 		<button class="show-menu" on:click={() => (showMenu = !showMenu)}>
 			{showMenu ? 'close' : 'menu'}
 		</button>
-<<<<<<< HEAD
-=======
-		<button class="show-menu" on:click={() => canvas.clear()}>
-			clear
-		</button>
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
+
 	</div>
 </div>
 
@@ -1422,13 +1403,9 @@ export const count = writable(0);
 </style>
 
 ```
-<<<<<<< HEAD
-`svelteLearning\my-app\src\routes\actions\Canvas.svelte`
-```vue
-=======
+
 ```vue
 
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { test } from './+page.svelte';
@@ -1456,14 +1433,11 @@ export const count = writable(0);
 		return { x, y };
 	}
 
-<<<<<<< HEAD
-=======
 	export function clear() {
 		// 清除画布
 		context.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
 	onMount(() => {
 		// 获取dom的2d对象
 		context = canvas.getContext('2d');
@@ -1568,10 +1542,7 @@ export const count = writable(0);
 </style>
 
 ```
-<<<<<<< HEAD
-`actions.ts`
-=======
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
+
 ```ts
 /**
  * @author Leroy
@@ -1644,15 +1615,12 @@ export function trapFocus(node: HTMLDivElement) {
 }
 
 ```
-<<<<<<< HEAD
+
 ###### update 避免异步
-=======
 
-
-##### update的副作用用法
 update 回调：当 action 的参数发生变化时，Svelte 会调用 update 回调。你可以在这里更新工具提示的属性。
 destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于清理工具提示。
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
+
 ```vue
 <script lang="ts">
 	import tippy, { type MultipleTargets, type Props } from 'tippy.js';
@@ -1687,10 +1655,6 @@ destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于�
 ```
 
 ##### 进阶绑定
-=======
-```
-
-#### 高级绑定
 `svelteLearning/my-app/src/routes/advBing/+page.svelte`
 ##### dom对象绑定
 ```vue
@@ -2086,8 +2050,6 @@ destroy 回调：当组件销毁时，Svelte 会调用 destroy 回调，用于�
 
 
 #### 插槽slot
->>>>>>> 38a8cc038d133de4347fd19845e6f0a98fcd4922
-
 
 
 
