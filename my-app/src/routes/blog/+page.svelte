@@ -2,7 +2,7 @@
 	export let data;
 
   // 同名获取
-  console.log(data);
+  // console.log(data);
   
 </script>
 

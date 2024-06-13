@@ -3374,3 +3374,1123 @@ src/
         +page.server.js 服务端脚本
 ```
 
++page.server.js 
+```ts
+import { error } from '@sveltejs/kit';
+import { posts } from '../data';
+
+export function load(data: { params: any }) {
+	// 居然是先传入到服务端脚本上。。。
+	// console.log('路由传参各种参数', data);
+
+	const { params } = data;
+
+	const post = posts.find((post) => post.slug === params.slug);
+	console.log(post);
+
+	// 跳转404
+	if (!post) throw error(404);
+
+	return {
+		// 这里我们就能接收到各种参数了
+		post,
+		params
+	};
+}
+
+```
+
++page.svelte
+```vue
+<script>
+  /**
+   * @author Leroy
+   * 动态路由传递，通过【文件夹】的形式
+   * 一个网址区段中可以显示多个路由参数，只要它们至少由一个静态字符分隔即可： foo/[bar]x[baz] 是有效的路由，其中 [bar] 和 [baz] 是动态参数。
+  */
+
+  export let data;
+  console.log(11111);
+</script>
+
+<h1>动态路由{data.params.slug}</h1>
+<h1>{data.post.title}</h1>
+<div>{@html data.post.content}</div>
+```
+
+###### 提示
++page.server.js  无法为  layout.svelte 提供props参数。
+```vue
+<script>
+	export let data;
+	// 布局文件就只能依靠layout.server.ts 接收后段参数
+	console.log("我不能接收", data);
+</script>
+
+<div class="layout">
+	<main>
+		<slot />
+	</main>
+</div>
+
+<style>
+	@media (min-width: 640px) {
+		.layout {
+			display: grid;
+			gap: 2em;
+			grid-template-columns: 1fr 16em;
+		}
+	}
+</style>
+```
+但是反过来，布局文件的 layout.server.ts 可以为+page.svelte 提供 $props 参数。
+
+#### 设置响应头和cookie
+
+`svelteLearning/my-app/src/routes/headercookie/+page.svelte`
+```vue
+<script lang="ts">
+  // 这个居然没用
+  // let { data } = $props();
+  export let data;
+  console.log(data);
+</script>
+
+<h1>11111</h1>
+```
+`svelteLearning/my-app/src/routes/headercookie/+page.server.ts`
+```ts
+  
+
+export function load({ setHeaders, cookies }: any) {
+
+// 手动设置响应头
+
+// setHeaders({
+
+// 'Content-Type': 'text/html; charset=utf-8;'
+
+// });
+
+// 手动设置cookie
+
+cookies.set('visited', 'true', { path: '/' });
+
+const visited = cookies.get('visited');
+
+cookies.set('visited', 'true', { path: '/' });
+
+  
+
+return {
+
+visited
+
+}
+
+}
+
+```
+
+#### $lib/xxx.js 跨目录脚本调用
+
+`svelteLearning/my-app/src/lib`
+```ts
+export const message = 'hello from $lib/message';
+```
+
+`src/routes/a/deeply/nested/route/+page.svelte`
+
+```vue
+<script>
+	import { message } from '$lib/message.js';
+</script>
+
+<h1>a deeply nested route</h1>
+<p>{message}</p>
+```
+
+#### 表单 form
+
+svelte对表单做了独特优化。
+`svelteLearning/my-app/src/routes/form/+page.svelte`
+```vue
+<script lang="ts">
+	/**
+	 * @author Leroy
+	 * ui回传到server端
+	 */
+  // 
+   import { enhance } from '$app/forms';
+  //  载入过度
+  import { fly, slide } from 'svelte/transition';
+
+	// 接收load 传递的参数
+	export let data;
+	// 接收form 异常表单返回
+	export let form;
+
+  async function handleSubmit(a) {
+    /**
+     * 直接获取 可以获取到事件的尾声，但是没有具体的参数，一般用来处理某些变化。实现慢加载之类的效果
+    */
+    // const response = await fetch('/api/todos', {
+    //   method: 'POST',
+    //   body: data
+    // });
+
+    // if (response.ok) {
+    //   // Handle success
+    //   console.log('Todo added successfully');
+    // } else {
+    //   // Handle error
+    //   console.error('Failed to add todo');
+    // }
+    // 
+    console.log("啊啊啊啊", a);
+  }
+</script>
+
+<div class="centered">
+	<h1>todos</h1>
+
+	{#if form?.error}
+		<p class="error">{form.error}</p>
+	{/if}
+	<!-- 输入值, 默认表单action就是 default -->
+	<!-- <form method="POST"> -->
+	<form method="POST" action="?/create" use:enhance={handleSubmit}>
+		<label>
+			add a todo:
+			<!-- 第一道防线是浏览器的内置表单验证，这使得您可以轻松地根据需要标记 <input> ： -->
+			<input name="description" autocomplete="off" required value={form?.description ?? ''} />
+		</label>
+	</form>
+
+	<!-- 循环渲染 -->
+	<ul class="todos">
+		{#each data.todos as todo (todo.id)}
+			<li>
+				<!-- 改变action 就可以改变server端 的触发器接口 -->
+				<form method="POST" action="?/delete">
+					<input type="hidden" name="id" value={todo.id} />
+					<span>{todo.description}</span>
+					<!-- 隐藏式表单传参数 -->
+					<button aria-label="Mark as complete">del</button>
+				</form>
+			</li>
+		{/each}
+	</ul>
+</div>
+
+<style>
+	.centered {
+		max-width: 20em;
+		margin: 0 auto;
+	}
+
+	label {
+		width: 100%;
+	}
+
+	input {
+		flex: 1;
+	}
+
+	span {
+		flex: 1;
+	}
+
+	button {
+		border: none;
+		background-size: 1rem 1rem;
+		cursor: pointer;
+		height: 100%;
+		aspect-ratio: 1;
+		opacity: 0.5;
+		transition: opacity 0.2s;
+	}
+
+	button:hover {
+		opacity: 1;
+	}
+
+	.saving {
+		opacity: 0.5;
+	}
+</style>
+```
+
+`svelteLearning/my-app/src/routes/form/+page.server.ts`
+```ts
+import * as db from '$lib/server/database.js';
+// 最好留在同一页面上并提供错误指示，以便用户可以修复它。为此，我们可以使用 fail 函数从操作返回数据以及适当的 HTTP 状态代码：
+import { fail } from '@sveltejs/kit';
+
+/**
+ * @author Leroy
+ * chrome不再支持cookie了，不要再用了
+ */
+let id: any;
+
+export function load({ cookies }: any) {
+	// cookie 有无 useid
+	id = cookies.get('userid');
+
+	// if (!id) {
+	// 	// 没有，我们就生成一个cookie
+	// 	id = crypto.randomUUID();
+	// 	// cookie
+	// 	cookies.set('userid', id, { path: '/' });
+	// }
+
+	// console.log("设置的cookie", cookies.get('userid'));
+
+	return {
+		todos: db.getTodos(id)
+	};
+}
+
+export const actions = {
+	// default 只要当前页面中只有一个form表单时，才能使用
+
+	// 多个表单中，不支持default
+	// 这里创建了一个接口，用来捕获表单动作
+	create: async (res: any) => {
+		const data = await res.request.formData();
+
+		// 我靠，永远获取不到cookie
+		// let id = await res.cookies.get('userid');
+		// 这里发生了一步创建新的todo对象
+		// db.createTodo(res.cookies.get('userid'), data.get('description'));
+
+		try {
+			db.createTodo(id, data.get('description'));
+		} catch (error) {
+      // 发生异常则，将返回一个对象
+			return fail(422, {
+				description: data.get('description'),
+				error: error.message
+			});
+		}
+	},
+	delete: async ({ cookies, request }) => {
+		// 这里就可以接收到另一张表单的传参数
+		const data = await request.formData();
+		db.deleteTodo(id, data.get('id'));
+	}
+};
+```
+
+`svelteLearning/my-app/src/lib/server/database.ts`
+
+```ts
+/**
+ * @author Leroy
+ * 从ui回调数据库
+ */
+// @ts-nocheck
+
+const db = new Map();
+
+export function getTodos(userid) {
+	if (!db.get(userid)) {
+		// 如果没有id存在，则我们放入一个默认id
+		db.set(userid, [
+			{
+				id: crypto.randomUUID(),
+				description: 'Learn SvelteKit',
+				done: false
+			}
+		]);
+	}
+
+	// 返回查找结果就好
+	return db.get(userid);
+}
+
+let sw = true;
+let todos: any;
+export function createTodo(userid, description) {
+	/**
+	 * @author Leroy
+	 * 传入id 和 内容
+	 * 根据id查找对象，放入
+	 */
+	// if (todos.find((todo) => todo.description === description)) {
+	// 	// 表单验证
+	// 	throw new Error('todos must be unique');
+	// }
+
+
+	if (sw) {
+    todos = db.get(userid);
+    sw = false
+  }
+
+	// if (todos.find((todo) => todo.description === description)) {
+	// 	// 表单验证
+	// 	throw new Error('todos must be unique');
+	// }
+
+	
+	todos.push({
+		id: crypto.randomUUID(),
+		description,
+		done: false
+	});
+}
+
+export function deleteTodo(userid, todoid) {
+	const todos = db.get(userid);
+	const index = todos.findIndex((todo) => todo.id === todoid);
+
+	if (index !== -1) {
+		todos.splice(index, 1);
+	}
+}
+```
+
+#### +server.ts 生成额外的接口
+
+这里只举一个构造 get 接口 例子：
+`svelteLearning/my-app/src/routes/webApi/+server.ts`
+```ts
+import { json } from '@sveltejs/kit';
+
+  
+
+export function GET(res: any) {
+
+// 直接获取response呢
+
+console.log(res);
+
+const number = Math.floor(Math.random() * 6) + 1;
+
+// 自定义输出
+
+// return new Response(number.toString(), {
+
+// headers: {
+
+// 'Content-Type': 'application/json'
+
+// }
+
+// });
+
+// 简单输出
+
+return json("123123123123")
+
+}
+```
+
+
+
+#### $app/stores 获取页面操作对象
+
+##### $page
+获取了页面全部的信息
+`svelteLearning/my-app/src/routes/app/+layout.svelte`
+```vue
+<script>
+
+import { page } from '$app/stores';
+
+  
+
+// 可以随时获取当前的页面信息
+
+console.log($page);
+
+</script>
+
+  
+
+<nav>
+
+<a href="/app" aria-current={$page.url.pathname === '/app'}> home </a>
+
+  
+
+<a href="/app/apps" aria-current={$page.url.pathname === '/app/apps'}> about </a>
+
+</nav>
+
+  
+
+<slot />
+```
+
+##### $navigating 存储导航
+
+'$app/navigation' 相互配合
+
+```vue
+<script>
+
+import { goto } from '$app/navigation';
+
+import { page, navigating } from '$app/stores';
+
+  
+
+// 可以随时获取当前的页面信息
+
+// console.log($page);
+
+// 配合$app/navigation 可以实现各种跳转信息的拦截。
+
+// console.log("获取路由信息", $navigating?.from);
+
+navigating.subscribe((router)=>{
+
+console.log(router);
+
+})
+
+</script>
+
+  
+
+<nav>
+
+<a href="/app" aria-current={$page.url.pathname === '/app'}> home </a>
+
+  
+
+<a href="/app/apps" aria-current={$page.url.pathname === '/app/apps'}> about </a>
+
+</nav>
+
+  
+
+<div>
+
+{#if $navigating}
+
+navigating to {$navigating.to.url.pathname}
+
+{/if}
+
+</div>
+
+  
+
+<slot />
+```
+
+##### $updated 鸡肋功能
+```vue
+<script>
+	import { goto } from '$app/navigation';
+	import { page, navigating, updated } from '$app/stores';
+
+	// 可以随时获取当前的页面信息
+	// console.log($page);
+  // 配合$app/navigation 可以实现各种跳转信息的拦截。
+  // console.log("获取路由信息", $navigating?.from);
+  // navigating.subscribe((router)=>{
+  //   console.log(router);
+  // })
+
+  // 这个是debug脚本，用来检测sveltekit 版本是否落后
+  console.log($updated);
+</script>
+
+<nav>
+	<a href="/app" aria-current={$page.url.pathname === '/app'}> home </a>
+
+	<a href="/app/apps" aria-current={$page.url.pathname === '/app/apps'}> about </a>
+</nav>
+
+<div>
+	{#if $navigating}
+		navigating to {$navigating.to.url.pathname}
+	{/if}
+</div>
+
+{#if $updated}
+	<div class="toast">
+		<p>
+			检测页面版本
+
+			<button on:click={() => location.reload()}>
+				reload the page
+			</button>
+		</p>
+	</div>
+{/if}
+
+<slot />
+```
+
+#### error异常处理
+
+```ts
+  
+  
+
+import { error } from '@sveltejs/kit';
+
+  
+
+export function load() {
+
+// 这里是预期错误
+
+throw error(420, 'Enhance your calm');
+
+// 这里是意外错误
+
+throw new Error('Kaboom!');
+
+}
+```
+
+##### 支持路由页面级别的异常处理
+
+![](Pasted%20image%2020240614012002.png)
+
+
+##### 支持静态页面直接处理
+
+`svelteLearning/my-app/src/routes/error.html`
+无法和+error.svelte共存啊。
+
+![](Pasted%20image%2020240614012154.png)
+
+
+##### 重定向redirect
+
+`svelteLearning/my-app/src/routes/+page.server.ts`
+
+```ts
+import { redirect } from '@sveltejs/kit';
+
+export function load() {
+	throw redirect(307, '/b');
+}
+```
+
+### sveltekit 高级方法
+
+这里我就不再代码中演示了，有需要时，自己来。
+
+#### hooks钩子方法
+##### 路由拦截
+`src/hooks.server.js`
+ 
+```ts
+export async function handle({ event, resolve }) {
+	if (event.url.pathname === '/ping') {
+		return new Response('pong');
+	}
+
+	return await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace(
+			'<body',
+			'<body style="color: hotpink"'
+		)
+	});
+}
+```
+
+#### 路由传参
+src/hooks.server.js
+```ts
+export async function handle({ event, resolve }) {
+	event.locals.answer = 42;
+	return await resolve(event);
+}
+```
+src/routes/+page.server.js
+```ts
+export function load(event) {
+	return {
+		message: `the answer is ${event.locals.answer}`
+	};
+}
+```
+
+##### api请求
+src/hooks.server.js
+
+```ts
+export async function handleFetch({ event, request, fetch }) {
+	const url = new URL(request.url);
+	if (url.pathname === '/a') {
+		return await fetch('/b');
+	}
+
+	return await fetch(request);
+}
+```
+
+
+##### 异常拦截
+src/hooks.server.js
+```ts
+export function handleError({ event, error }) {
+	console.error(error.stack);
+
+	return {
+		message: 'everything is fine',
+		code: 'JEREMYBEARIMY'
+	};
+}
+```
+`src/routes/+error.svelte`
+```ts
+<script>
+	import { page } from '$app/stores';
+</script>
+
+<h1>{$page.status}</h1>
+<p>{$page.error.message}</p>
+<p>error code: {$page.error.code}</p>
+```
+
+
+#### kit配置
+
+##### ssr 服务端渲染
+也就是说，某些组件无法在服务器上呈现，可能是因为它们希望能够立即访问浏览器全局变量，例如 window 。如果可以，您应该更改这些组件，以便它们可以在服务器上呈现，但如果不能，则可以禁用 SSR：
+
+src/routes/+page.server.js
+```ts
+export const ssr = false;
+```
+
+将根 +layout.server.js 内的 ssr 设置为 false 可以有效地将整个应用程序转变为单页应用程序 (SPA)。
+
+
+##### csr 客户端渲染
+src/routes/+page.server.js
+
+```ts
+export const csr = false;
+```
+这意味着不会向客户端提供 JavaScript，但也意味着您的组件不再具有交互性。它可以是一种有用的方法来检查您的应用程序是否适合那些（无论出于何种原因）无法使用 JavaScript 的人使用。
+
+
+##### SSG 静态网站
+src/routes/+page.server.js
+
+```ts
+export const prerender = true;
+```
+在根目录 +layout.server.js 中将 prerender 设置为 true 可以有效地将 SvelteKit 转变为静态站点生成器 (SSG)。
+
+##### /path/配置
+简而言之，对尾部斜线过于松散是一个坏主意。默认情况下，SvelteKit 会去除尾部斜杠，这意味着对 /foo/ 的请求将导致重定向到 /foo 。
+
+src/routes/always/+page.server.js
+
+```ts
+export const trailingSlash = 'always';
+```
+
+src/routes/ignore/+page.server.js
+```ts
+export const trailingSlash = 'ignore';
+```
+
+默认值为 'never' 。
+
+##### 导航优化
+```
+您无法总是使数据加载得更快 - 有时这是您无法控制的 - 但 SvelteKit 可以通过预测来加快导航速度。当 <a> 元素具有 data-sveltekit-preload-data 属性时，只要用户将鼠标悬停在链接上（在桌面上）或点击它（在移动设备上），SvelteKit 就会开始导航。尝试将其添加到第一个链接：
+```
+
+```ts
+src/routes/+layout.svelte
+<nav>
+	<a href="/">home</a>
+	<a href="/slow-a" data-sveltekit-preload-data>slow-a</a>
+	<a href="/slow-b">slow-b</a>
+</nav>
+```
+
+```
+Navigating to /slow-a will now be noticeably faster. Starting navigation on hover or tap (rather than waiting for a click event to be registered) might not sound like it makes much difference, but in practice it typically saves 200ms or more. That's enough to be the difference between sluggish and snappy.
+现在导航到 /slow-a 的速度明显更快。通过悬停或点击启动导航（而不是等待注册 click 事件）听起来可能没有太大区别，但实际上它通常可以节省 200 毫秒或更多。这足以成为迟缓和敏捷之间的区别。
+
+You can put the attribute on individual links, or on any element that contains links. The default project template includes the attribute on the <body> element:
+您可以将该属性放在各个链接上，或放在任何包含链接的元素上。默认项目模板包含 <body> 元素上的属性：
+
+<body data-sveltekit-preload-data>
+	%sveltekit.body%
+</body>
+You can customise the behaviour further by specifying one of the following values for the attribute:
+您可以通过为属性指定以下值之一来进一步自定义行为：
+
+"hover" (default, falls back to "tap" on mobile)
+"hover" （默认，在移动设备上回退到 "tap" ）
+"tap" — only begin preloading on tap
+"tap" — 仅在点击时开始预加载
+"off" — disable preloading
+"off" — 禁用预加载
+Using data-sveltekit-preload-data may sometimes result in false positives - i.e. loading data in anticipation of a navigation that doesn't then happen — which might be undesirable. As an alternative, data-sveltekit-preload-code allows you to preload the JavaScript needed by a given route without eagerly loading its data. This attribute can have the following values:
+使用 data-sveltekit-preload-data 有时可能会导致误报 - 即在预期导航不会发生的情况下加载数据 - 这可能是不可取的。作为替代方案， data-sveltekit-preload-code 允许您预加载给定路由所需的 JavaScript，而无需急切地加载其数据。该属性可以具有以下值：
+
+"eager" — preload everything on the page following a navigation
+"eager" — 导航后预加载页面上的所有内容
+"viewport" — preload everything as it appears in the viewport
+"viewport" - 预加载视口中显示的所有内容
+"hover" (default) as above
+"hover" （默认）同上
+"tap" — as above  "tap" — 如上所述
+"off" — as above  "off" — 如上所述
+You can also initiate preloading programmatically with preloadCode and preloadData imported from $app/navigation:
+您还可以使用从 $app/navigation 导入的 preloadCode 和 preloadData 以编程方式启动预加载：
+```
+
+
+```ts
+import { preloadCode, preloadData } from '$app/navigation';
+
+// preload the code and data needed to navigate to /foo
+preloadData('/foo');
+
+// preload the code needed to navigate to /bar, but not the data
+preloadCode('/bar');
+```
+
+##### 状态重置
+src/routes/+layout.svelte
+当路由切换时，刷新页面。重置所有对象
+```vue
+<nav data-sveltekit-reload>
+	<a href="/">home</a>
+	<a href="/about">about</a>
+</nav>
+```
+
+#### 路由
+
+##### 枚举路由？
+鸡肋啊。
+src/routes/[[lang]]/+page.server.js
+
+```ts
+const greetings = {
+	en: 'hello!',
+	de: 'hallo!',
+	fr: 'bonjour!'
+};
+
+export function load({ params }) {
+	return {
+		greeting: greetings[params.lang ?? 'en']
+	};
+}
+```
+
+
+##### 不定参数路由
+鸡肋啊
+`src/routes/[...path]/+page.svelte`
+
+```vue
+<script>
+	import { page } from '$app/stores';
+
+	let words = ['how', 'deep', 'does', 'the', 'rabbit', 'hole', 'go'];
+
+	$: depth = $page.params.path.split('/').filter(Boolean).length;
+	$: next = depth === words.length ? '/' : `/${words.slice(0, depth + 1).join('/')}`;
+</script>
+
+<div class="flex">
+	{#each words.slice(0, depth) as word}
+		<p>{word}</p>
+	{/each}
+
+	<p><a href={next}>{words[depth] ?? '?'}</a></p>
+</div>
+
+<style>
+	.flex {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	p {
+		margin: 0.5rem 0;
+		line-height: 1;
+	}
+
+	a {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		font-size: 4rem;
+	}
+</style>
+
+```
+
+##### 匹配路由
+多页应用上应该会很好用...
+src/params/hex.js
+
+```ts
+export function match(value) {
+	return /^[0-9a-f]{6}$/.test(value);
+}
+```
+
+`/routes/color/[color=hex]/+page.svelte`
+```vue
+<script>
+	import { page } from '$app/stores';
+</script>
+
+<div class="color" style="--color: #{$page.params.color}">
+	<span>#{$page.params.color}</span>
+</div>
+
+<style>
+	.color {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color);
+		transition: background-color 0.2s;
+	}
+
+	span {
+		mix-blend-mode: soft-light;
+		color: black;
+		font-size: 4em;
+	}
+</style>
+
+```
+
+##### 路由拦截
+这才是牛逼的用法
+https://learn.svelte.dev/tutorial/route-groups
+src/routes/(authed)/+layout.server.js
+
+```ts
+import { redirect } from '@sveltejs/kit';
+
+export function load({ cookies, url }) {
+	if (!cookies.get('logged_in')) {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+	}
+}
+```
+
+src/routes/(authed)/+layout.svelte
+
+```vue
+<slot></slot>
+
+<form method="POST" action="/logout">
+	<button>log out</button>
+</form>
+```
+
+
+##### 打破布局嵌套
+通常，页面继承其上方的每个布局，这意味着 src/routes/a/b/c/+page.svelte 继承四种布局：
+src/routes/+layout.svelte
+src/routes/a/+layout.svelte
+src/routes/a/b/+layout.svelte
+src/routes/a/b/c/+layout.svelte
+
+![](Pasted%20image%2020240614020219.png)
+
+加入@后，可以重置根布局文件。
+
+
+#### 强服务端渲染，load函数高级用法
+
+##### 方法一
+https://learn.svelte.dev/tutorial/universal-load-functions
+
+src/routes/+layout.svelte
+
+```vue
+<nav
+	class:has-color={!!$page.data.color}
+	style:background={$page.data.color ?? 'var(--bg-2)'}
+>
+	<a href="/">home</a>
+	<a href="/red">red</a>
+	<a href="/green">green</a>
+	<a href="/blue">blue</a>
+
+	{#if $page.data.component}
+		<svelte:component this={$page.data.component} />
+	{/if}
+</nav>
+```
+
+```ts
+import component from './red.svelte';
+
+export function load() {
+	return {
+		color: 'red',
+		component
+	};
+}
+
+```
+
+
+##### 方法二
+src/routes/+page.js
+
+```ts
+export async function load({ data }) {
+	const module = data.cool
+		? await import('./CoolComponent.svelte')
+		: await import('./BoringComponent.svelte');
+
+	return {
+		component: module.default,
+		message: data.message
+	};
+}
+```
+
+
+##### load 函数本身访问其父函数的数据很有用。这可以通过 await parent() 来完成。
+
+src/routes/+layout.server.js
+```ts
+export function load() {
+	return { a: 1 };
+}
+```
+src/routes/sum/+layout.js
+```ts
+export async function load({ parent }) {
+	const { a } = await parent();
+	return { b: a + 1 };
+}
+```
+src/routes/sum/+page.js
+```ts
+export async function load({ parent }) {
+	const { a, b } = await parent();
+	return { c: a + b };
+}
+```
+
+
+##### 解除load重加载
+类似状态重置的反向用例。
+src/routes/[...timezone]/+page.svelte
+
+```vue
+<script>
+	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
+
+	export let data;
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			invalidate('/api/now');
+		}, 1000);
+
+		return () => {
+			clearInterval(interval);
+		};
+	});
+</script>
+
+<h1>
+	{new Intl.DateTimeFormat([], {
+		timeStyle: 'full',
+		timeZone: data.timezone
+	}).format(new Date(data.now))}
+</h1>
+```
+
+进阶解决
+src/routes/+layout.js
+
+```
+export async function load({ depends }) {
+	depends('data:now');
+
+	return {
+		now: Date.now()
+	};
+}
+```
+
+src/routes/[...timezone]/+page.svelte
+
+```
+<script>
+	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
+
+	export let data;
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			invalidate('data:now');
+		}, 1000);
+
+		return () => {
+			clearInterval(interval);
+		};
+	});
+</script>
+```
+
+
+最强解决方法
+src/routes/[...时区]/+page.svelte
+
+```
+<script>
+	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
+
+	export let data;
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			invalidateAll();
+		}, 1000);
+
+		return () => {
+			clearInterval(interval);
+		};
+	});
+</script>
+```
+
+#### 部署
+
+- 环境变量（例如 API 密钥和数据库凭据）可以添加到 .env 文件中，并且它们将可供您的应用程序使用 https://learn.svelte.dev/tutorial/env-static-private
+- 如果您需要在应用程序运行时（而不是构建应用程序时）读取环境变量的值，则可以使用https://learn.svelte.dev/tutorial/env-dynamic-private
+- 一些环境变量可以安全地暴露给浏览器。它们与带有 PUBLIC_ 前缀的私有环境变量区分开来。 https://learn.svelte.dev/tutorial/env-static-public
+- 与私有环境变量一样，如果可能的话最好使用静态值，但如果有必要，我们可以使用动态值：https://learn.svelte.dev/tutorial/env-dynamic-public
+
+
+## 再补充细节
+
+未完待续。。。。

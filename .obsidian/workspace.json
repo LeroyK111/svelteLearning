@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "f1a962799b2e784f",
+        "id": "88ae028778f3c89e",
         "type": "tabs",
         "children": [
           {
-            "id": "4924a190cb3b1348",
+            "id": "7a5d0286a0a39186",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "README.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -86,7 +82,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +98,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,9 +119,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "README.md"
-              }
+              "state": {}
             }
           }
         ],
@@ -147,19 +139,23 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "4924a190cb3b1348",
+  "active": "7a5d0286a0a39186",
   "lastOpenFiles": [
-    "my-app/src/routes/blog/+page.server.ts",
-    "my-app/src/routes/blog/page1.server.ts",
-    "my-app/src/routes/blog/[slug]/+page.server.ts",
-    "my-app/vite.config.ts.timestamp-1718208200608-239549f26afaa.mjs",
-    "my-app/vite.config.ts.timestamp-1718207936644-39ab7310c8ee6.mjs",
-    "my-app/vite.config.ts.timestamp-1718207916274-7baeef917fde1.mjs",
-    "my-app/src/routes/blog/data.ts",
-    "my-app/src/routes/blog/+page.svelte",
-    "my-app/src/routes/blog/+page.svelte.ts",
-    "my-app/src/routes/blog/[slug]/+page.svelte.ts",
-    "my-app/src/routes/blog/[slug]/+layout.svelte",
+    "README.md",
+    "readme.assets/Pasted image 20240614020219.png",
+    "未命名.md",
+    "my-app/src/routes/hooks.server.ts",
+    "my-app/src/routes/+page.server.ts",
+    "my-app/src/routes/error.html",
+    "readme.assets/Pasted image 20240614012154.png",
+    "readme.assets/Pasted image 20240614012002.png",
+    "my-app/src/routes/erros/+page.svelte",
+    "my-app/src/routes/erros/+page.server.ts",
+    "my-app/src/routes/erros",
+    "my-app/src/routes/app/apps/+page.svelte",
+    "my-app/src/routes/app/apps",
+    "my-app/src/routes/app/+page.svelte",
+    "my-app/src/routes/app/+layout.svelte",
     "readme.assets/Pasted image 20240612131845.png",
     "my-app/static/mylog.png",
     "my-app/src/assets/svelte-logo.svg",
@@ -186,14 +182,9 @@
     "my-app/node_modules/call-bind/CHANGELOG.md",
     "my-app/node_modules/mdn-data/README.md",
     "my-app/node_modules/mdn-data/css/readme.md",
-    "my-app/node_modules/mdn-data/CHANGELOG.md",
-    "my-app/node_modules/asap/LICENSE.md",
     "my-app/src/assets/sound-on.svg",
     "my-app/src/assets/sound-off.svg",
     "my-app/src/assets/play.svg",
-    "my-app/src/assets/pause.svg",
-    "my-app/src/assets/svelte-logo-mask.svg",
-    "my-app/node_modules/playwright-core/lib/vite/traceViewer/playwright-logo.svg",
-    "my-app/node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg"
+    "my-app/src/assets/pause.svg"
   ]
 }
