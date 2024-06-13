@@ -1,6 +1,8 @@
 <script lang="ts">
 	// 需要大写
 	import Nested from '../components/Nested.svelte';
+	import Tem from '../components/Tem.svelte';
+	import { goto } from '$app/navigation';
 
 	let name = 'hello world';
 	let src = '/src/assets/mylog.png';
@@ -21,20 +23,21 @@
 	$: doubled = count * 2;
 	// 高级监听器，但不是函数式的，而是函数体本身，
 	$: console.log(`自动监听？ ${doubled}`);
-  // 这里只会执行一次.
-  $: {
-    console.log("1");
-    console.log("2");
-  }
-  // 写判断都可以。。。
-  $: if (count > 10){
-    alert(`${count}`)
-    count = 0
-  }
-
-  
-
+	// 这里只会执行一次.
+	$: {
+		console.log('1');
+		console.log('2');
+	}
+	// 写判断都可以。。。
+	$: if (count > 10) {
+		alert(`${count}`);
+		count = 0;
+	}
 </script>
+
+<button on:click={() => goto('/bind')}>点我跳转</button>
+
+<Tem></Tem>
 
 <!-- 模板语法{} -->
 <h1>{name}</h1>
@@ -57,7 +60,6 @@
 
 <!-- 组件引入 -->
 <Nested></Nested>
-
 
 <style>
 	h1 {

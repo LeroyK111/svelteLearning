@@ -1,5 +1,5 @@
 <script>
-  import Markdown  from "../../components/Markdown.svelte"
+	import Markdown from '../../components/Markdown.svelte';
 
 	let name = 'word';
 
@@ -26,8 +26,6 @@
 		console.log(e.currentTarget);
 	};
 	let selected = 2;
-
-
 
 	// 多选框
 	let scoops = 1;
@@ -100,13 +98,12 @@
 </div>
 <!-- 多选框 -->
 <div>
-  <select multiple bind:value={flavours}>
-    {#each ['cookies and cream', 'mint choc chip', 'raspberry ripple'] as flavour}
-      <option>{flavour}</option>
-    {/each}
-  </select>
+	<select multiple bind:value={flavours}>
+		{#each ['cookies and cream', 'mint choc chip', 'raspberry ripple'] as flavour}
+			<option>{flavour}</option>
+		{/each}
+	</select>
 </div>
 
-
-
 <Markdown></Markdown>
+
